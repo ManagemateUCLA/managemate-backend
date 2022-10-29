@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 
 const roomateGroupSchema = new mongoose.Schema(
     {
+        gid: {
+            type: String,
+            required: true,
+            unqiue: true
+        },
         name: {
             type: String,
             required: true,
