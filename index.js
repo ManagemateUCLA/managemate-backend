@@ -1,25 +1,22 @@
 const express = require('express');
 const app = express();
 const dotenv = require('dotenv');
-const mongoose = require('mongoose');
+const connectDB = require("./db");
 
 // Import Routes 
 const authRoute = require('./routes/auth');
 dotenv.config();
 
 // connect to DB 
-mongoose.connect(process.env.DB_CONNECTION);
-
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection error: "));
-db.once("open", function () {
-  console.log("Connected successfully");
-});
+connectDB();
 
 // Middlewares
 app.use(express.json());
 
 // Route Middlewares 
-app.use('/api/user', authRoute);
+app.use('/auth', authRoute);
 
-app.listen(3000, () => console.log('server up and running'));
+const portNumber = process.env.PORT || 3000;
+app.listen(portNumber, function () {
+    console.log("Managemate Backend listening on port " + portNumber);
+});
