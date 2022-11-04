@@ -5,7 +5,7 @@ const roomateGroupSchema = new mongoose.Schema(
         gid: {
             type: String,
             required: true,
-            unique: true
+            unqiue: true
         },
         name: {
             type: String,
