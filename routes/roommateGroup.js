@@ -95,8 +95,6 @@ router.post('/join', verify, async (req, res) => {
         Expected fields in request body
         {
             'gid': String
-            'user name': String
-            'uid': String
         }
     */
     const groupId = req.body.gid
