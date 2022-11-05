@@ -132,4 +132,48 @@ router.post('/join', verify, async (req, res) => {
 }
 );
 
+/**
+ * * Removes the user from the group passed in body and updates the gid in user database 
+ */
+ router.post('/leave', verify, async (req, res) => {
+    /*
+        Expected fields in request body
+        {
+            'gid': String
+        }
+    */
+    const groupId = req.body.gid
+    const userId = req.user._id
+    // remove user from the group
+    RoommateGroup.findOneAndUpdate(
+        {gid: groupId},
+        {"$pull" : {members: userId}}, 
+        null,
+        (error, result) => {
+            if (error) {
+                console.log(error)
+                res.status(400).send(error)
+            } else {
+                console.log(result)
+            }
+        }
+    )
+
+    // set gid in user database for this user 
+    User.findOneAndUpdate(
+        {_id: userId},
+        {gid: ''},
+        null,
+        (error, result) =>{
+            if (error) {
+                console.log(error)
+                res.status(400).send(error)
+            } else {
+                console.log(result)
+                res.status(200).send(result)
+            }
+        }
+    )    
+}
+);
 module.exports = router;
