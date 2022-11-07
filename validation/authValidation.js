@@ -3,7 +3,8 @@ const Joi = require('@hapi/joi');
 
 const authSchema = Joi.object().keys({
     email: Joi.string().min(6).messages({'string.pattern.base': `Must be a valid email`}).required().email(),
-    password: Joi.string().min(6).messages({'string.pattern.base': `Password must be more than 5 characters`}).required()
+    password: Joi.string().min(6).messages({'string.pattern.base': `Password must be more than 5 characters`}).required(),
+    name: Joi.string().min(4).messages({'string.pattern.base': `Name must be more than 3 characters`}).required()
 });
 
 // Register Validation 

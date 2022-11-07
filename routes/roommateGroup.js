@@ -45,6 +45,10 @@ router.post('/create', verify, async (req, res) => {
 
     let tooManyRepeatedTries = 0;
 
+    if (!reqObj.groupName) {
+        res.status(400).send("Group name is required to create group")
+        return;
+    }
     let gid = null;
     while (true) {
         gid = helpers.randomStr(constants.GROUP_ID_LENGTH, constants.ALPHANUMERIC_STRING);
@@ -99,6 +103,11 @@ router.post('/join', verify, async (req, res) => {
     */
     const groupId = req.body.gid
     const userId = req.user._id
+
+    if(!groupId)
+    {
+        res.status(400).send("GID is required to join group")
+    }
     // add user to the group
     RoommateGroup.findOneAndUpdate(
         {gid: groupId},

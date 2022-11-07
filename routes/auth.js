@@ -23,8 +23,8 @@ router.post("/register", async (req, res) => {
     // Checking if email or phone exists
     const emailExist = await User.findOne({ email: req.body.email });
 
-    if (emailExist || phoneExist)
-        return res.status(400).send("Email/Phone already exists");
+    if (emailExist)
+        return res.status(400).send("Email already exists");
 
     // Hash the passwords
     const salt = await bcrypt.genSalt(10);
@@ -50,8 +50,8 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
     // Lets Validate the data before we a user
     console.log(req.body);
-    const { error } = loginValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    // const { error } = loginValidation(req.body);
+    // if (error) return res.status(400).send(error.details[0].message);
 
     // Checking if email exists -> if not then user must register first
     const user = await User.findOne({ email: req.body.email });
@@ -66,13 +66,7 @@ router.post("/login", async (req, res) => {
         process.env.TOKEN_SECRET
     );
 
-    res.send(token);
-});
-
-// /auth/testJWT
-router.get("/testJWT", verify, async (req, res) => {
-    console.log(req.user)
-    res.send(req.user);
+    res.send({token: token});
 });
 
 module.exports = router;
