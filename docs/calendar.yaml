@@ -1,0 +1,117 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Calendar APIs
+  description: List of APIs related to chore management with the Calendar APIs
+
+components:
+ schemas:
+  Chore:
+    type: object
+    required:
+      - title
+        duration
+    properties: 
+      title:
+        type: string
+      duration:
+        type: number # time it will take to get a chore done, in hours
+      time_of_day_start:
+        type: string   # time in HH:MM. 24 hour
+      time_of_day_end:
+        type: string   # must be included if time_of_day_start is specified
+      preferred_days:
+        type: array    # array of days of the week
+        items:
+          type: string
+      id:
+        type: string   # not to be specified on creation request
+        
+        
+
+paths:
+  /calendar/{gid}/createChore:
+    post:
+          description: Create a new chore
+          parameters:
+            - name: gid
+              in: path
+              required: true
+              schema:
+                type: string
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Chore'
+          responses:
+            '200':
+              description: Successfully created a new chore
+
+            '400':
+              description: Invalid request
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:   
+                      message:
+                        type: string
+
+  /calendar/{gid}/getChores:
+    get:
+      description: Get a list of all the chores
+      parameters:
+        - name: gid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully returned a list of chores for the roommate group
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:   
+                  message:
+                    type: string
+
+  /calendar/{gid}/deleteChore:
+    delete:
+      description: Delete chore
+      parameters:
+        - name: gid
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: choreid
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully returned a list of chores for the roommate group
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:   
+                  message:
+                    type: string
