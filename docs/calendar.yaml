@@ -14,12 +14,10 @@ components:
     properties: 
       title:
         type: string
-      duration:
-        type: number # time it will take to get a chore done, in hours
       time_of_day_start:
         type: string   # time in HH:MM. 24 hour
-      time_of_day_end:
-        type: string   # must be included if time_of_day_start is specified
+      duration:
+        type: number   # in minutes, must be included if time_of_day_start is specified
       preferred_days:
         type: array    # array of days of the week
         items:
@@ -27,9 +25,38 @@ components:
       id:
         type: string   # not to be specified on creation request
         
-        
+  Event:
+    type: object
+    properties:
+      name: 
+        type: string
+      day:
+        type: string
+      start_time:
+        type: string  # time in HH:MM. 24 hour
+      duration:
+        type: number # in minutes
+      associated_with:
+        type: string  # id
+      associated_with_name:
+        type: string
+    
+  Calendar: 
+    type: object
+    required:
+      - gid
+    properties:
+      gid:
+        type: string
+      events:
+        type: array
+        items:
+          $ref: '#/components/schemas/Event'
+
+
 
 paths:
+# ----------- Chore APIs --------------
   /calendar/{gid}/createChore:
     post:
           description: Create a new chore
@@ -115,3 +142,54 @@ paths:
                 properties:   
                   message:
                     type: string
+
+# --------------- Calendar APIs ---------------
+
+  /calendar/{gid}/getCalendar:
+    get:
+      description: Get calendar for current week, from Sunday to Saturday
+      parameters:
+        - name: gid
+          in: path
+          required: true
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: Successfully returned Calendar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:   
+                  message:
+                    type: string
+
+  /calendar/{gid}/resetCalendar:
+    post:
+      description: Reset calendar based on new changes
+      parameters:
+        - name: gid
+          in: path
+          required: true
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: Successfully updated calendar
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:   
+                  message:
+                    type: string
+
