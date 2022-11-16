@@ -1,0 +1,117 @@
+openapi: 3.0.3
+info:
+  title: Finance APIs
+  version: 1.0.0
+
+components:
+  schemas:
+    Transaction:
+      description: "A transaction capyures a new expense or payment made by roomates"
+      type: object
+      required:
+        - title 
+          amount
+          gid
+      properties:
+        title:
+          type: string 
+        amount:
+          type: number  # number type includes double and float
+        lender:
+          type: string  # person who pays
+        borrowers:
+          type: array  # people involved in a transaction. Note: if lender is involved they must be in the array 
+          items:
+            type: string 
+        date:
+          type: string  # string type includes date type
+        gid: 
+          type: string  
+        isProcessed:  
+          type: boolean  # a flag to ensure that the transaction is recorded in the simplify debt table 
+          default: false
+    
+    BorrowerAmountMap:  # this is not a Mongo Schema. This will be an internal Node object 
+      description: "Map(borrower, amount). (<*> == borrower)"
+      type: object
+      additionalProperties:
+        description: "amount"
+        type: number
+    
+    BalanceTable:  # this is not a Mongo Schema. This is just an object returned in getBalance API 
+      description: "Map(lender, Map(borrower, amount)). (<*> == lender)"
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/BorrowerAmountMap'  
+        
+        
+    SimplificationTable:
+      type: object
+      required:
+        - gid
+      properties:
+        gid: 
+          type: string  
+        table:
+          description: "Map(lender, Map(borrower, amount)). (<*> == lender)"
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/BorrowerAmountMap'  
+
+paths:
+  /finance/recordTransaction:
+    post:
+      description: Add a new expense or record a mutual payment 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+        '200':
+          description: Successfully added the transaction 
+        
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:   
+                  message:
+                    type: string
+
+  /finance/{gid}/getBalance:
+    get:
+      description: gets the current group balance by simplfying debts  
+      parameters:
+        - name: gid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully returned a map of balances -> Map(lender, Map(borrower, amount))
+          content:
+            application/json:
+              schema:
+                example:
+                  Abhishek:
+                    Kate: 10
+                    Sanchit: 20
+                  Guilherme:
+                    Aritra: 40
+
+
+        
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:   
+                  message:
+                    type: string
