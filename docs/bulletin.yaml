@@ -1,0 +1,81 @@
+openapi: 3.0.3
+info:
+  title: Bulletin Board APIs
+  version: 1.0.0
+
+components:
+  schemas:
+    Event:
+      description: "An event is an added point on the bulletin board with JWT to ensure we are still within a logged in session"
+      type: object 
+      required: 
+        - message 
+          gid
+      properties: 
+        message:
+          type: string 
+          example: "Aritra needs to get a life"
+        gid: 
+          type: string
+          example: "AX67F (Some group ID)"
+        
+        
+paths:
+  /board/addEvent:
+    post:
+      description: Add a new event for the bulletin board
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        '200':
+          description: Successfully added the event for the Bulletin Board for a specific gid
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:   
+                  message:
+                    type: string
+                    
+  /board:
+    get: 
+      description: Get details of the Bulletin Board for a particular gid, with JWT sent to ensure we are within a login session
+      parameters:
+        - in: query
+          name: fields
+          style: deepObject
+          allowReserved: true
+      
+      responses:
+        '200':
+          description: Successfully returned all the events on a bulletin board
+      
+
+  /board/deleteEvent:
+    post:
+      description: Add a new expense or record a mutual payment 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        '200':
+          description: Successfully added the transaction 
+        
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:   
+                  message:
+                    type: string
