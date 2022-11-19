@@ -17,7 +17,7 @@ router.post('/:gid/createChore',  async (req, res) => {
     // console.log(req);
     try {
         let gid = req.params['gid'];
-        let task_name = req.body['title'];
+        let task_name = req.body['name'];
         let start_time = req.body['time_of_day_start'];
         let duration = req.body['duration'];
         let preferred_days = req.body['preferred_days'];
