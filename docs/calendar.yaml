@@ -9,10 +9,10 @@ components:
   Chore:
     type: object
     required:
-      - title
+      - name
         duration
     properties: 
-      title:
+      name:
         type: string
       time_of_day_start:
         type: string   # time in HH:MM. 24 hour
