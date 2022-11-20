@@ -21,12 +21,6 @@ paths:
         - User
       summary: Sign up a new user in
       operationId: register
-      parameters:
-        - in: header
-          name: user
-          description: JWT Token
-          schema:
-            $ref: '#/components/schemas/JWTUser'
       requestBody:
         content:
           application/json:
@@ -53,12 +47,6 @@ paths:
         - User
       summary: Log a new user in
       operationId: login
-      parameters:
-        - in: header
-          name: user
-          description: JWT Token
-          schema:
-            $ref: '#/components/schemas/JWTUser'
       requestBody:
         content:
           application/json:

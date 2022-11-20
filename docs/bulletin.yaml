@@ -5,23 +5,49 @@ info:
 
 components:
   schemas:
-    Event:
-      description: "An event is an added point on the bulletin board with JWT to ensure we are still within a logged in session"
+    NewEvent:
+      description: "An event is an added point on the bulletin board - New Event is object requested during creation of an event"
       type: object 
       required: 
         - message 
           gid
+          uid
       properties: 
+        uid:
+          type: string
+          example: "Mongo DB Object ID for user sending request"
+        gid:
+          type: string
+          example: "AX5HG"
         message:
           type: string 
           example: "Aritra needs to get a life"
-        gid: 
+          
+    ExistingEvent:
+      description: "Object needed for deletion of an event within bulletin board of a group"
+      type: object 
+      required: 
+        - _id
+          gid
+          uid
+      properties: 
+        uid:
           type: string
-          example: "AX67F (Some group ID)"
+          example: "Mongo DB Object ID for user sending request"
+        gid:
+          type: string
+          example: "AX5HG"
+        _id:
+          type: string
+          example: "Mongo DB Object ID for the Event being edited/deleted"
+    UserGroupDetails:
+      description: "Useful for "
+    
+
         
         
 paths:
-  /board/addEvent:
+  /bulletinBoard/{uid}/addEvent:
     post:
       description: Add a new event for the bulletin board
       requestBody:
@@ -43,21 +69,29 @@ paths:
                   message:
                     type: string
                     
-  /board:
+  /bulletinBoard/{uid}/getEvents:
     get: 
       description: Get details of the Bulletin Board for a particular gid, with JWT sent to ensure we are within a login session
       parameters:
+        - in: path
+          required: true
+          name: uid
+          schema:
+            type: string
+            example: Mongo DB Object ID for User
         - in: query
-          name: fields
-          style: deepObject
-          allowReserved: true
-      
+          required: true
+          name: gid
+          schema: 
+            type: string
+            example: AX67F (Some group ID)
+          
       responses:
         '200':
           description: Successfully returned all the events on a bulletin board
       
 
-  /board/deleteEvent:
+  /bulletinBoard/{uid}/deleteEvent:
     post:
       description: Add a new expense or record a mutual payment 
       requestBody:

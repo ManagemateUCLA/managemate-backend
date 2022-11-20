@@ -1,6 +1,19 @@
 const mongoose = require('mongoose');
 
-const roomateGroupSchema = new mongoose.Schema(
+const bulletinBoardEventSchema = new mongoose.Schema(
+    {
+        uid: {
+            type: String,
+            required: true,
+        },
+        message: {
+            type: String,
+            required: true
+        }
+    }
+)
+
+const roommateGroupSchema = new mongoose.Schema(
     {
         gid: {
             type: String,
@@ -24,8 +37,12 @@ const roomateGroupSchema = new mongoose.Schema(
             required: false,
             min: 1,
             max: 128
+        },
+        bulletinBoard: {
+            type: [bulletinBoardEventSchema],
+            default: []
         }
     }
 );
 
-module.exports = mongoose.model('RoommateGroup', roomateGroupSchema);
+module.exports = mongoose.model('RoommateGroup', roommateGroupSchema)
