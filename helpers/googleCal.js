@@ -14,7 +14,7 @@ async function loadSavedCredentialsIfExist(userTokenJSON) {
 }
 
 
-async function listEvents(userTokenJSON) {
+module.exports.getEvents = async (userTokenJSON) => {
     let auth = await loadSavedCredentialsIfExist(userTokenJSON);
     if (!auth) {
         console.log("auth token issue");
@@ -50,7 +50,7 @@ async function listEvents(userTokenJSON) {
 }
 
 
-async function addEvent(userTokenJSON, event) {
+module.exports.addEvent = async (userTokenJSON, event) => {
     let auth = await loadSavedCredentialsIfExist(userTokenJSON);
     if (!auth) {
         console.log("auth token issue");
@@ -80,7 +80,7 @@ async function addEvent(userTokenJSON, event) {
     return eventID;
 }
 
-async function deleteEvent(userTokenJSON, eventID) {
+module.exports.deleteEvent = async (userTokenJSON, eventID) => {
     let auth = await loadSavedCredentialsIfExist(userTokenJSON);
     if (!auth) {
         console.log("auth token issue");
