@@ -3,7 +3,7 @@ const router = require("express").Router();
 const RoommateGroup = require('../model/RoommateGroup');
 const User = require('../model/User');
 const constants = require('../constants');
-const helpers = require('../helpers/roommateGroup');
+const helpers = require('../helpers/general');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { response } = require('express');
@@ -108,36 +108,39 @@ router.post('/join', verify, async (req, res) => {
     {
         res.status(400).send("GID is required to join group")
     }
+
     // add user to the group
-    RoommateGroup.findOneAndUpdate(
+    let addUser = await RoommateGroup.findOneAndUpdate(
         {gid: groupId},
         {"$push" : {members: userId}}, 
-        null,
-        (error, result) => {
-            if (error) {
-                console.log(error)
-                res.status(400).send(error)
-            } else {
-                console.log(result)
-            }
+        null
+    ).then(function (result, error)  {
+        if (error) {
+            console.log(error);
+            res.status(400).send(error);
+            return;
+        } else {
+            console.log(result);
         }
-    )
+    })
 
     // set gid in user database for this user 
-    User.findOneAndUpdate(
+    await User.findOneAndReplace(
         {_id: userId},
         {gid: groupId},
-        null,
-        (error, result) =>{
-            if (error) {
-                console.log(error)
-                res.status(400).send(error)
-            } else {
-                console.log(result)
-                res.status(200).send(result)
-            }
+        null
+    ).then(function (result, error)
+    {
+        if (error) {
+            console.log(error);
+            res.status(400).send(error);
+            return;
+        } else {
+            console.log(result);
         }
-    )    
+    })
+    
+    res.status(200).send("OK");
 }
 );
 
@@ -154,35 +157,49 @@ router.post('/join', verify, async (req, res) => {
     const groupId = req.body.gid
     const userId = req.user._id
     // remove user from the group
-    RoommateGroup.findOneAndUpdate(
-        {gid: groupId},
-        {"$pull" : {members: userId}}, 
-        null,
-        (error, result) => {
-            if (error) {
-                console.log(error)
-                res.status(400).send(error)
-            } else {
-                console.log(result)
+    try {
+        await RoommateGroup.findOneAndUpdate(
+            {gid: groupId},
+            {"$pull" : {members: userId}}, 
+            null,
+            (error, result) => {
+                if (error) {
+                    console.log(error);
+                    res.status(400).send(error);
+                    return;
+                } else {
+                    console.log(result);
+                }
             }
-        }
-    )
+        )
+    }
+    catch(err) {
+        // update failed: MongoDB error
+        res.status(400).send("Could not remove user from group!")
+    }
 
-    // set gid in user database for this user 
-    User.findOneAndUpdate(
-        {_id: userId},
-        {gid: ''},
-        null,
-        (error, result) =>{
-            if (error) {
-                console.log(error)
-                res.status(400).send(error)
-            } else {
-                console.log(result)
-                res.status(200).send(result)
+    try {
+        // set gid in user database for this user 
+        await User.findOneAndUpdate(
+            {_id: userId},
+            {gid: ''},
+            null,
+            (error, result) =>{
+                if (error) {
+                    console.log(error);
+                    res.status(400).send(error);
+                    return; 
+                } else {
+                    console.log(result);
+                }
             }
-        }
-    )    
+        )  
+        res.status(200).send("OK");
+    }  
+    catch(err) {
+        // update failed: MongoDB error
+        res.status(400).send("Could not set group gid in user schema!")
+    }
 }
 );
 module.exports = router;
