@@ -27,6 +27,9 @@ const userSchema = new mongoose.Schema(
         },
         gid: {
             type: String
+        }, 
+        gcal_token: {
+            type: Object
         }
     }
 );
