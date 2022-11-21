@@ -1,18 +1,29 @@
 const string = require('@hapi/joi/lib/types/string');
 const mongoose = require('mongoose');
 
-const Event = new mongoose.Schema(
+const Chore = new mongoose.Schema(
     {
         name: {
             type: String,
             required: true,
         },
-        day: String,
         start_time: String,
         duration: Number,
         preferred_days: [String],
+    }
+)
+
+const GCalEvent = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+        },
+        start_time: Date,
+        end_time: Date,
         associated_with: String, // id
-        associated_with_name: String // name of person
+        associated_with_name: String, // name of person
+        gcal_event_id: String
     }
 )
 
@@ -24,9 +35,9 @@ const calendarSchema = new mongoose.Schema(
             required: true,
             unqiue: true
         },
-        added_events: [Event],
+        added_events: [Chore],
         scheduled_events: {
-            type: [Event],
+            type: [GCalEvent],
             default: []
         }
     }
