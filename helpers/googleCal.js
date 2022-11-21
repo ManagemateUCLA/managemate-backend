@@ -39,10 +39,12 @@ module.exports.getEvents = async (userTokenJSON) => {
     }
 
     events.forEach((ele, index) => {
+        let startDate = new Date(ele.start.dateTime);
+        let endDate = new Date(ele.end.dateTime);
         mongoEvent = {
             name: ele.summary,
-            start: ele.start.dateTime,
-            end: ele.end.dateTime
+            start: startDate,
+            end: endDate
         }
         events[index] = mongoEvent
     })
