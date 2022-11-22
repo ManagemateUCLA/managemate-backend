@@ -32,15 +32,23 @@ router.post('/:gid/createChore',  async (req, res) => {
     try {
         let gid = req.params['gid'];
         let task_name = req.body['name'];
-        let start_time = req.body['time_of_day_start'];
         let duration = req.body['duration'];
         let preferred_days = req.body['preferred_days'];
-
-        let event_object = {
-            'name': task_name,
-            'duration': duration,
-            'preferred_days': preferred_days,
-            'start':start_time
+        let event_object;
+        if (req.body['start']) {
+            let start_time = req.body['start'];
+            event_object = {
+                'name': task_name,
+                'duration': duration,
+                'preferred_days': preferred_days,
+                'start':start_time
+            }
+        } else {
+            event_object = {
+                'name': task_name,
+                'duration': duration,
+                'preferred_days': preferred_days,
+             }
         }
         
         Calendar.findOneAndUpdate(
@@ -148,37 +156,60 @@ function dateMax(date1, date2) {
     return date1;
 }
 
+
 function mergeEvents(intervals) {
-    intervals.sort((a,b) => a.start - b.start);
-    const results = [];
-    for(let interval of intervals) {
-        const prev = results.at(-1);
-        if (!results.length || prev.end < interval.start) {
-            results.push(interval);
-        } else {
-            prev.end = dateMax(prev.end, interval.end);
-        }
+    intervals.sort((a, b) => a.start.getTime() - b.start.getTime())
+    const res = [intervals[0]]
+    for (let curr of intervals) {
+      prev = res[res.length - 1]
+      if (prev.end >= curr.start) {
+        prev.end = dateMax(curr.end, prev.end)
+      } else {
+        res.push(curr)
+      }
     }
-    return results;
+    return res
 };
 
 // no events should be scheduled between 8pm and 8am, so this function makes night an event by blocking it off
 function blockOffNights(event_list) {
     let rn = new Date();
-    for (let i=0; i < 7; i++) {
-        let night_start = rn;
+
+    let today_morning_start = new Date(rn);
+    today_morning_start.setHours(0);
+    today_morning_start.setMinutes(0);
+
+    let today_morning_end = new Date(rn);
+    today_morning_end.setHours(8);
+    today_morning_end.setMinutes(0);
+    event_list.push({name: 'night', start: today_morning_start, end: today_morning_end});
+
+    for (let i=0; i < 6; i++) {
+        let night_start = new Date(rn);
         night_start.setHours(20);
         night_start.setMinutes(00);
         night_start.setDate(rn.getDate() + i);
 
-        let night_end = rn;
-        night_start.setHours(8);
-        night_start.setMinutes(00);
-        night_start.setDate(rn.getDate() + i + 1);
+        let night_end = new Date(rn);
+        night_end.setHours(8);
+        night_end.setMinutes(00);
+        night_end.setDate(rn.getDate() + i + 1);
 
         let event = {name: 'night', start: night_start, end: night_end};
         event_list.push(event);
     }
+
+    let last_day_night_start = new Date(rn);
+    last_day_night_start.setDate(last_day_night_start.getDate() + 6);
+    last_day_night_start.setHours(20);
+    last_day_night_start.setMinutes(0);
+
+    let last_day_night_end = new Date(rn);
+    last_day_night_end.setDate(last_day_night_end.getDate() + 6);
+    last_day_night_end.setHours(23);
+    last_day_night_end.setMinutes(0);
+
+    event_list.push({name: 'night', start: last_day_night_start, end: last_day_night_end});
 
 }
 
@@ -212,7 +243,8 @@ function parseEventList(event_list) {
         return null;
 
     // get the date-time of cutoff of the events after a week from now, which is when the user events are fetched from
-    let end_time = new Date() + 7; 
+    let end_time = new Date();
+    end_time.setDate(end_time.getDate() + 6); 
     end_time.setHours(23);
     end_time.setMinutes(59);
 
@@ -221,7 +253,8 @@ function parseEventList(event_list) {
         let curr_event = event_list[i];
         if (curr_event.start > end_time) {
             // remove it from the list entirely
-            arr.splice(i, 1);
+            event_list.splice(i, 1);
+            i = i - 1; // reread the element at the current position
 
         } else if (curr_event.end > end_time) {
             // slice the event
@@ -229,7 +262,7 @@ function parseEventList(event_list) {
         }
     }
 
-    let day_bucket = [[]];
+    let day_bucket = [[],[],[],[],[],[],[]];
     for (let i = 0; i < event_list.length; i++) {
         const event = event_list[i];
 
@@ -240,7 +273,7 @@ function parseEventList(event_list) {
 
             assert(event1.end !== event.start);
 
-            let event2 = {'name': new String(event.name), 'start': new Date(event.end), 'end': new Date(event.end)};
+            let event2 = {'name': new String(event.name), 'start': new Date(event.start), 'end': new Date(event.end)};
             // override day to the next day
             event2.start.setDate(event2.start.getDate() + 1);
             event2.start.setHours(0);
@@ -287,7 +320,7 @@ function findTimeInDay(chore, events) {
             let chore_end = new Date(chore_start);
             chore_end.setTime(chore_start.getTime() + millisecond_duration);
 
-            if (curr_event <= chore_start && (next_event.getTime() - chore_start.getTime() >= millisecond_duration)) {
+            if (curr_event.end <= chore_start && (next_event.start.getTime() - chore_start.getTime() >= millisecond_duration)) {
                 // construct the schedule
                 const assigned_chore = {
                     name: chore.name,
@@ -298,8 +331,8 @@ function findTimeInDay(chore, events) {
             }
 
         } else {
-            if (next_event.getTime() - curr_event.getTime() >= millisecond_duration) {
-                let chore_start = new Date(curr_event.start);
+            if (next_event.start.getTime() - curr_event.end.getTime() >= millisecond_duration) {
+                let chore_start = new Date(curr_event.end);
                 let chore_end = new Date(chore_start);
                 chore_end.setTime(chore_start.getTime() + millisecond_duration);
 
@@ -321,19 +354,15 @@ function findTimeInDay(chore, events) {
 function findAvailableTime(chore, event_list, days_to_search) {
 
 
-    // let chore_start = chore['start_time']; // HH:MM
-    // if (!isCorrectTimeFormat(chore_start)) {
-    //     throw Error("Bad chore time format");
-    // }
-
     // find the days to search
     let day_indices_to_search = [];
-    for (const day in days_to_search) {
+    for (let i = 0; i < days_to_search.length; i++) {
+        let day = days_to_search[i];
         day_indices_to_search.push(day_index[day]);
     }
 
     let day_bucket = parseEventList(event_list);
-    for (let index in day_indices_to_search) {
+    for (let index of day_indices_to_search) {
         let day_events = day_bucket[index];
 
         let assigned_chore = findTimeInDay(chore, day_events);
@@ -450,6 +479,54 @@ async function scheduleChores(gid) {
             }
         }
     )
+
+    return assigned_chores;
 }
+
+router.get('/:gid/getCalendar', async(req, res) => {
+    // try {
+    //     let gid = req.params['gid'];
+    //     let assigned_chores = await scheduleChores(gid);
+    //     res.status(200).send(assigned_chores);
+    // } catch(err) {
+    //     res.json({message: err});
+    // }
+
+    // TODO: remove. only here for unit testing
+
+    const chore = {
+        name: 'alibaba',
+        duration: 30,
+        preferred_days: ['Tuesday']
+    };
+
+    const users = ['someid', 'otherid'];
+
+    const user_info = {
+        'someid' : {
+            'name' : 'Ya Baba',
+            'events' : [
+                {
+                    'name': 'Fly',
+                    'start': new Date('November 22, 2022 08:00:00'),
+                    'end': new Date('November 22, 2022 19:40:00')
+                }
+            ]
+        },
+        'otherid': {
+            'name': 'brodi',
+            'events': [
+                {
+                    'name': 'Swim',
+                    'start': new Date('November 22, 2022 08:00:00'),
+                    'end': new Date('November 22, 2022 19:50:00')
+                }
+            ]
+        }
+    }
+    let ret = findMatchingUser(chore, users, user_info);
+    res.status(200).send(ret);
+
+})
 
 module.exports = router;
