@@ -27,10 +27,9 @@ router.post('/', async (req, res) => {
             }
         }
         else {
-            res.status(400).send("Incorrect Permissions")
+            res.status(403).send("Incorrect Permissions")
         }
     }
-
     catch(err) {
         res.status(400).send(err);
     }
@@ -46,33 +45,34 @@ router.post('/addEvent', async (req, res) => {
             message: message
         }
         try {
-                // add user to the group
-            console.log(uid, gid, message);
-            let resp = await helpers.checkUserInGroup(gid, uid)
-            
-            RoommateGroup.findOneAndUpdate(
-                {gid: gid},
-                {"$push" : { bulletinBoard: event }}, 
-                null,
-                (error, result) => {
-                    if (error) {
-                        console.log(error)
-                        res.status(400).send(error)
-                    } else {
-                        console.log("hi");
-                        // console.log(result)
+            let userInGroup = await helpers.checkUserInGroup(gid, uid)
+            if (userInGroup) {
+                RoommateGroup.findOneAndUpdate(
+                    {gid: gid},
+                    {"$push" : { bulletinBoard: event }}, 
+                    null,
+                    (error, result) => {
+                        if (error) {
+                            console.log(error)
+                            res.status(400).send(error);
+                        } else {
+                            res.status(200).send(result);
+                        }
                     }
-                }
-            )  
+                )  
+            }
+
+            else {
+                res.status(403).send("Incorrect Permissions");
+            }
+            
         } catch (err) {
             res.status(400).send(err);
         }
     }
-
     catch(err){
-        res.json({message: err});
+        res.status(400).send(err);
     }
-   
 });
 
 
