@@ -91,7 +91,12 @@ router.delete('/:gid/deleteChore', async(req, res) => {
                     return;
                 } else {
                     console.log(result)
-                    res.status(200).send("Success")
+                    if (result.modifiedCount == 0) {
+                        res.status(404).send("Not found chore to delete");
+                    } else {
+                        res.status(200).send("Success")
+                    }
+                    
                     return;
                 }
             }
