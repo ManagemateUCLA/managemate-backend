@@ -39,6 +39,7 @@ module.exports.getEvents = async (userTokenJSON) => {
     }
 
     events.forEach((ele, index) => {
+        console.log(ele);
         let startDate = new Date(ele.start.dateTime);
         let endDate = new Date(ele.end.dateTime);
         mongoEvent = {
@@ -60,7 +61,7 @@ module.exports.addEvent = async (userTokenJSON, event) => {
     }
 
     const calendar = google.calendar({version: 'v3', auth});
-    const event = {
+    let gCalEvent = {
         'summary': event.name,
         'start': {
         'dateTime': event.start.toISOString(),
@@ -75,7 +76,7 @@ module.exports.addEvent = async (userTokenJSON, event) => {
     let response = await calendar.events.insert({
         auth: auth,
         calendarId: 'primary',
-        resource: event,
+        resource: gCalEvent,
     })
 
     let eventID = response.data.id;
