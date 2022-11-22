@@ -22,9 +22,16 @@ module.exports.getEvents = async (userTokenJSON) => {
     }
 
     const calendar = google.calendar({version: 'v3', auth});
+
     let timeMin = new Date();
+    timeMin.setHours(0,0,0,0);
+
     let timeMax = new Date();
+    timeMax.setHours(0,0,0,0);
     timeMax.setDate(timeMax.getDate() + 7);
+
+    console.log("timeMin", timeMin);
+    console.log("timeMax", timeMax);
 
     const res = await calendar.events.list({
         calendarId: 'primary',
@@ -39,7 +46,6 @@ module.exports.getEvents = async (userTokenJSON) => {
     }
 
     events.forEach((ele, index) => {
-        console.log(ele);
         let startDate = new Date(ele.start.dateTime);
         let endDate = new Date(ele.end.dateTime);
         mongoEvent = {
