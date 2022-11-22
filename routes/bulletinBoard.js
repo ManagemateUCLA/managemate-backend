@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
         const gid = req.body.gid;
         const uid = req.body.uid;
         console.log(req.body)
-        let userInGroup = helpers.checkUserInGroup(gid, uid)
+        let userInGroup = await helpers.checkUserInGroup(gid, uid)
         if (userInGroup) {
             try {
                 groupDetails = await RoommateGroup.findOne({gid: gid});
