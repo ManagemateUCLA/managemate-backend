@@ -7,6 +7,7 @@ const connectDB = require("./db");
 const authRoute = require('./routes/auth');
 const roommateGroupRoute = require('./routes/roommateGroup');
 const calendarRoute = require('./routes/calendar');
+const userRoute = require('./routes/user');
 dotenv.config();
 
 // connect to DB 
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use('/auth', authRoute);
 app.use('/roommateGroup', roommateGroupRoute);
 app.use('/calendar', calendarRoute);
+app.use('/user', userRoute);
 
 const portNumber = process.env.PORT || 3000;
 app.listen(portNumber, function () {
