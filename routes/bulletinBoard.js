@@ -10,20 +10,29 @@ const { response } = require('express');
 const verify = require("./verifyJWTToken");
 
 
-router.get('/', async (req, res) => {
+router.post('/', async (req, res) => {
     try{
-        const userObj = await User.findById(req.user._id);
-        const gid = userObj.gid;
-        try {
-            groupDetails = await RoommateGroup.findOne({gid: gid});
-            res.status(200).send(groupDetails);
-        } catch (err) {
-            res.status(400).send(err);
+        const gid = req.body.gid;
+        const uid = req.body.uid;
+        console.log(req.body)
+        let userInGroup = helpers.checkUserInGroup(gid, uid)
+        if (userInGroup) {
+            try {
+                groupDetails = await RoommateGroup.findOne({gid: gid});
+                let bulletinBoard = groupDetails.bulletinBoard;
+                console.log(groupDetails)
+                res.status(200).send(bulletinBoard);
+            } catch(err) {
+                res.status(400).send(err);
+            }
+        }
+        else {
+            res.status(400).send("Incorrect Permissions")
         }
     }
 
-    catch(err){
-        res.json({message: err});
+    catch(err) {
+        res.status(400).send(err);
     }
 });
 
