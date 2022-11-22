@@ -1,5 +1,16 @@
 // This file is to define the helper functions for routes/roommateGroup.js
 
+const RoommateGroup = require('../model/RoommateGroup');
+
+module.exports.checkUserInGroup = async (gid, uid) => {
+    let roommateGroup = await RoommateGroup.findOne({gid: gid});
+    if (!roommateGroup)
+        return false
+    let members = roommateGroup.members;
+    console.log(members);
+    return members.includes(uid);
+}
+
 /**
  * * Helper method - creates random string 
  * @param len Length of the random string 
