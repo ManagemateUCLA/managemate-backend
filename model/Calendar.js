@@ -4,10 +4,10 @@ const mongoose = require('mongoose');
 const Chore = new mongoose.Schema(
     {
         name: {
-            type: String,
+            type: String,           // HH:MM
             required: true,
         },
-        start_time: String,
+        start: String,
         duration: Number,
         preferred_days: [String],
     }
@@ -19,8 +19,8 @@ const GCalEvent = new mongoose.Schema(
             type: String,
             required: true,
         },
-        start_time: Date,
-        end_time: Date,
+        start: Date,
+        end: Date,
         associated_with: String, // id
         associated_with_name: String, // name of person
         gcal_event_id: String
