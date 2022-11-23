@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { response } = require('express');
 const verify = require("./verifyJWTToken");
+const { group } = require("console");
 
 /**
  * * Gets the group details based on the uid in jwt token 
@@ -185,4 +186,28 @@ router.post('/join', verify, async (req, res) => {
     )    
 }
 );
+
+router.get('/:gid/listRoommates',  async (req, res) => {
+    try {
+
+        let gid = req.params['gid'];
+        const group_info = await RoommateGroup.findOne({gid: gid});
+        let members = group_info.members;
+        let names = [];
+        for (let id of members) {
+            const user_info = await User.findOne({_id: id});
+            names.push(user_info.name);
+        }   
+        console.log(names);
+        res.status(200).send(names);
+        return;
+
+    } catch (err) {
+        console.log(err.message);
+        res.status(400).send(err);
+        return;
+    }
+    
+})
+
 module.exports = router;
