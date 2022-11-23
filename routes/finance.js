@@ -70,10 +70,12 @@ router.post("/recordTransaction", async (req, res) => {
             return res.status(400).send("Invalid Members: One of the lenders or borrowers are not in the specified group!"); 
         }
     }
+    members.pop();
 
     let simplifiedSpendingTable = financeHelpers.simplifyDebts(spendingTable, lender, borrowers, amount, "add");
+    console.log(simplifiedSpendingTable);
     try {
-        const updated = await BalanceTable.replaceOne({ gid: gid }, { table: simplifiedSpendingTable });
+        const updated = await BalanceTable.updateOne({ gid: gid }, { $set: { table: simplifiedSpendingTable }});
         if (!updated) return res.status(401).send("User is not updated");
     } catch (err) {
         res.status(400).send(err);
@@ -122,7 +124,7 @@ router.delete("/deleteTransaction", async (req, res) => {
         let spendingTable = gidExist.table;
         let simplifiedSpendingTable = financeHelpers.simplifyDebts(spendingTable, lender, borrowers, amount, "delete");
         try {
-            const updated = await BalanceTable.replaceOne({ gid: gid }, { table: simplifiedSpendingTable });
+            const updated = await BalanceTable.updateOne({ gid: gid }, { $set: { table: simplifiedSpendingTable }});
             if (!updated) return res.status(401).send("User is not updated");
         } catch (err) {
             res.status(400).send(err);
@@ -228,7 +230,6 @@ router.get("/getBalance", async (req, res) => {
     try {
         // check if the newly generated gid exists 
         let spendingGroupExists = await BalanceTable.findOne({gid: gid});
-
         if(!spendingGroupExists) {
             return res.status(400).send("A spending group with the provided gid does not exist");
         }
@@ -236,46 +237,6 @@ router.get("/getBalance", async (req, res) => {
         return res.status(200).send(spendingGroupExists.table);
     } catch (err) {
         return res.status(400).send("Could not get the Spending Table");
-    }
-});
-
-router.post("/test", async (req, res) => {
-    const map1 = new Map();
-
-    map1.set('a', 1);
-    map1.set('b', 2);
-    map1.set('c', 3);
-
-    const table = new BalanceTable({
-        gid: 'ABHSK',
-        table: {
-            user1: map1,
-            user2: map1
-        }
-    });
-
-//     try {
-//         tables = await table.save();
-//         console.log(tables);
-//         res.status(200).send(tables);
-//    } catch (err) {
-//         res.status(400).send(err);
-//    }
-
-    try {
-        // transactions = await BalanceTable.find({_id: "637aabcd51efed18c9c35a6d"});
-        // let table = transactions[0].table;
-        // let user1 = table.get("user1");
-        // user1["a"] = 5;
-        // console.log(user1);
-        // table.set("user1", user1);
-        // console.log(table);
-        // await BalanceTable.findOneAndUpdate({_id: "637aabcd51efed18c9c35a6d"}, {table: table});
-        // transactions = await BalanceTable.find({_id: "637aabcd51efed18c9c35a6d"});
-        // console.log(user1["a"]);
-        // res.status(200).send(transactions);
-    } catch (err) {
-        res.status(400).send(err);
     }
 });
 

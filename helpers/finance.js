@@ -170,14 +170,14 @@ function getUnitTransactions (lender, borrowers, amount, type) {
     for(let i = 0; i < numBorrowers; i++) {
         let unitTransaction = {}
         if(type == "add") {
-            const unitTransaction = {
+            unitTransaction = {
                 lender: lender,
                 borrower: borrowers[i],
                 amount: splitAmount
             };
         }
         else if(type == "delete") {
-            const unitTransaction = {
+            unitTransaction = {
                 lender: borrowers[i],
                 borrower: lender,
                 amount: splitAmount
@@ -190,6 +190,9 @@ function getUnitTransactions (lender, borrowers, amount, type) {
 
 
 function simplifyDebts (spendingTable, lender, borrowers, amount, type) {
+    console.log(lender);
+    console.log(borrowers);
+    console.log(amount);
     let unitTransactions = getUnitTransactions(lender, borrowers, amount, type);
     // create a 2D array of transactions 
     var balanceArray = []
@@ -226,11 +229,11 @@ function simplifyDebts (spendingTable, lender, borrowers, amount, type) {
         if(i != j)
             balanceArray[i][j] += obj.amount;
     }
-
+    console.log(unitTransactions);
     // simplify debts 
     balanceArray = makeGraphBipartite(balanceArray);
     balanceArray = simplifyHourglassTransactions(balanceArray);
-
+    console.log(balanceArray);
     // create balance map
     let balanceMap = new Map();
     for (let i = 0; i < balanceArray.length; i++) {
@@ -244,6 +247,7 @@ function simplifyDebts (spendingTable, lender, borrowers, amount, type) {
         }
         balanceMap.set(creditor, balances);
     }
+    console.log(balanceMap);
     return balanceMap;
 }
 
