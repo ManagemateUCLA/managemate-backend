@@ -16,6 +16,19 @@ module.exports.checkUserInGroup = async (gid, uid) => {
     }
 }
 
+module.exports.getGroupId = async (discordServerId) => {
+    try {
+        let roommateGroup = await RoommateGroup.findOne({discordServerId: discordServerId});
+        if (!roommateGroup)
+            return null
+        let gid = roommateGroup.gid;
+        console.log(gid);
+        return gid;
+    } catch(err) {
+        return null;
+    }
+}
+
 /**
  * * Helper method - creates random string 
  * @param len Length of the random string 

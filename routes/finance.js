@@ -17,7 +17,6 @@ const financeHelpers = require("../helpers/finance.js");
 const { response } = require('express');
 
 // Endpoints 
-
 /**
  * POST
  * Add a new expense or record a payment/settlement
@@ -29,7 +28,7 @@ router.post("/recordTransaction", async (req, res) => {
             "amount": <TRANSACTION_AMOUNT>,
             "lender": <TRANSACTION_LENDER>,
             "borrowers": [<TRANSACTION_BORROWER>, ],
-            "gid": <GROUP_ID>
+            "discordServerId": <discordServerId>
         }
     */
 
@@ -37,8 +36,11 @@ router.post("/recordTransaction", async (req, res) => {
     const lender = req.body.lender;
     const borrowers = req.body.borrowers;
     const amount = req.body.amount;
-    const gid = req.body.gid;
-
+    const discordServerId = req.body.discordServerId;
+    const gid = await generalHelpers.getGroupId(discordServerId);
+    if (!gid) {
+        return res.status(400).send("No group exists with the given discordserverid"); 
+    }
     // create the transaction object
     const transaction = new Transaction({
         title: req.body.title,
@@ -141,7 +143,7 @@ router.delete("/deleteTransaction", async (req, res) => {
 
 /**
  * GET 
- * Gets all transactions of a a given group as a sorted list
+ * Gets all transactions of a given group as a sorted list
  */
  router.get("/getTransactions", async (req, res) => {
     /*
