@@ -489,48 +489,48 @@ async function scheduleChores(gid) {
 }
 
 router.get('/:gid/getCalendar', async(req, res) => {
-    // try {
-    //     let gid = req.params['gid'];
-    //     let assigned_chores = await scheduleChores(gid);
-    //     res.status(200).send(assigned_chores);
-    // } catch(err) {
-    //     res.json({message: err});
-    // }
-
-    // TODO: remove. only here for unit testing
-
-    const chore = {
-        name: 'alibaba',
-        duration: 30,
-        preferred_days: ['Tuesday']
-    };
-
-    const users = ['someid', 'otherid'];
-
-    const user_info = {
-        'someid' : {
-            'name' : 'Ya Baba',
-            'events' : [
-                {
-                    'name': 'Fly',
-                    'start': new Date('November 22, 2022 08:00:00'),
-                    'end': new Date('November 22, 2022 19:40:00')
-                }
-            ]
-        },
-        'otherid': {
-            'name': 'brodi',
-            'events': [
-                {
-                    'name': 'Swim',
-                    'start': new Date('November 22, 2022 08:00:00'),
-                    'end': new Date('November 22, 2022 19:50:00')
-                }
-            ]
-        }
+    try {
+        let gid = req.params['gid'];
+        let assigned_chores = await scheduleChores(gid);
+        res.status(200).send(assigned_chores);
+    } catch(err) {
+        res.json({message: err});
     }
-    let ret = findMatchingUser(chore, users, user_info);
-    res.status(200).send(ret);
+
+    // // TODO: remove. only here for unit testing
+
+    // const chore = {
+    //     name: 'alibaba',
+    //     duration: 30,
+    //     preferred_days: ['Tuesday']
+    // };
+
+    // const users = ['someid', 'otherid'];
+
+    // const user_info = {
+    //     'someid' : {
+    //         'name' : 'Ya Baba',
+    //         'events' : [
+    //             {
+    //                 'name': 'Fly',
+    //                 'start': new Date('November 22, 2022 08:00:00'),
+    //                 'end': new Date('November 22, 2022 19:40:00')
+    //             }
+    //         ]
+    //     },
+    //     'otherid': {
+    //         'name': 'brodi',
+    //         'events': [
+    //             {
+    //                 'name': 'Swim',
+    //                 'start': new Date('November 22, 2022 08:00:00'),
+    //                 'end': new Date('November 22, 2022 19:50:00')
+    //             }
+    //         ]
+    //     }
+    // }
+    // let ret = findMatchingUser(chore, users, user_info);
+    // res.status(200).send(ret);
 
 })
 
