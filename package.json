@@ -21,6 +21,7 @@
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.0",
     "@hapi/joi": "^17.1.1",
+    "@veryfi/veryfi-sdk": "^1.2.2",
     "bcryptjs": "^2.4.3",
     "chai": "^4.3.6",
     "chai-http": "^4.3.0",
