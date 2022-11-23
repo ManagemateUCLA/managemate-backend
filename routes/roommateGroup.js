@@ -109,38 +109,85 @@ router.post('/join', verify, async (req, res) => {
     {
         res.status(400).send("GID is required to join group")
     }
+
     // add user to the group
-    RoommateGroup.findOneAndUpdate(
+    let addUser = await RoommateGroup.findOneAndUpdate(
         {gid: groupId},
         {"$push" : {members: userId}}, 
-        null,
-        (error, result) => {
-            if (error) {
-                console.log(error)
-                res.status(400).send(error)
-            } else {
-                console.log(result)
-            }
+        null
+    ).then(function (result, error)  {
+        if (error) {
+            console.log(error);
+            res.status(400).send(error);
+            return;
+        } else {
+            console.log(result);
         }
-    )
+    })
 
     // set gid in user database for this user 
-    User.findOneAndUpdate(
+    await User.findOneAndReplace(
         {_id: userId},
         {gid: groupId},
-        null,
-        (error, result) =>{
-            if (error) {
-                console.log(error)
-                res.status(400).send(error)
-            } else {
-                console.log(result)
-                res.status(200).send(result)
-            }
+        null
+    ).then(function (result, error)
+    {
+        if (error) {
+            console.log(error);
+            res.status(400).send(error);
+            return;
+        } else {
+            console.log(result);
         }
-    )    
+    })
+    
+    res.status(200).send("OK");
 }
 );
+
+router.post('/linkGroup', async (req, res) => {
+    const gid = req.body.gid;
+    const discordUserId = req.body.discordUserId;
+    const discordServerId = req.body.discordServerId;
+    try {
+        let userObject = await User.findOne({discordUserId: discordUserId});
+        let uid = await userObject._id;
+        // checking if this group has this user within it
+        let userInGroup = await helpers.checkUserInGroup(gid, uid);
+        if (userInGroup) {
+            // we link the roommate group id to the discord server id
+            let filter = {gid: gid};
+            let update = {discordServerId: discordServerId}
+            console.log("hi");
+            RoommateGroup.findOneAndUpdate(
+                filter,
+                update, 
+                null,
+                (error, result) => {
+                    if (error) {
+                        console.log(error)
+                        res.status(400).send(error);
+                        return;
+                    } else {
+                        console.log(result)
+                        res.status(200).send("Updated discordServerId and gid");
+                        return;
+                    }
+                }
+            )
+
+        }
+        else {
+            res.status(404).send("Unable to find the gid/permission issue");
+            return;
+        }
+
+    } catch (err) {
+        res.status(400).send(err);
+        return;
+    }
+})
+
 
 /**
  * * Removes the user from the group passed in body and updates the gid in user database 
@@ -155,35 +202,49 @@ router.post('/join', verify, async (req, res) => {
     const groupId = req.body.gid
     const userId = req.user._id
     // remove user from the group
-    RoommateGroup.findOneAndUpdate(
-        {gid: groupId},
-        {"$pull" : {members: userId}}, 
-        null,
-        (error, result) => {
-            if (error) {
-                console.log(error)
-                res.status(400).send(error)
-            } else {
-                console.log(result)
+    try {
+        await RoommateGroup.findOneAndUpdate(
+            {gid: groupId},
+            {"$pull" : {members: userId}}, 
+            null,
+            (error, result) => {
+                if (error) {
+                    console.log(error);
+                    res.status(400).send(error);
+                    return;
+                } else {
+                    console.log(result);
+                }
             }
-        }
-    )
+        )
+    }
+    catch(err) {
+        // update failed: MongoDB error
+        res.status(400).send("Could not remove user from group!")
+    }
 
-    // set gid in user database for this user 
-    User.findOneAndUpdate(
-        {_id: userId},
-        {gid: ''},
-        null,
-        (error, result) =>{
-            if (error) {
-                console.log(error)
-                res.status(400).send(error)
-            } else {
-                console.log(result)
-                res.status(200).send(result)
+    try {
+        // set gid in user database for this user 
+        await User.findOneAndUpdate(
+            {_id: userId},
+            {gid: ''},
+            null,
+            (error, result) =>{
+                if (error) {
+                    console.log(error);
+                    res.status(400).send(error);
+                    return; 
+                } else {
+                    console.log(result);
+                }
             }
-        }
-    )    
+        )  
+        res.status(200).send("OK");
+    }  
+    catch(err) {
+        // update failed: MongoDB error
+        res.status(400).send("Could not set group gid in user schema!")
+    }
 }
 );
 
