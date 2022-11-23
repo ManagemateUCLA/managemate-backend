@@ -126,7 +126,7 @@ router.post('/join', verify, async (req, res) => {
     })
 
     // set gid in user database for this user 
-    await User.findOneAndReplace(
+    await User.findOneAndUpdate(
         {_id: userId},
         {gid: groupId},
         null

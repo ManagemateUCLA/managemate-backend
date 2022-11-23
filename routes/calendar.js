@@ -4,7 +4,7 @@ const RoommateGroup = require('../model/RoommateGroup');
 const User = require('../model/User');
 const Calendar = require('../model/Calendar');
 const constants = require('../constants');
-const helpers = require('../helpers/general');
+const helpers = require('../helpers/googleCal');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { response } = require('express');
@@ -419,7 +419,7 @@ async function scheduleChores(gid) {
         const token = user['gcal_token'];
         const name = user['name'];
         //call function that returns all events for user, and add to the dict of events
-        const events = getEvents(token);
+        const events = await helpers.getEvents(token);
 
         const curr_user_info = {
             name: name,
@@ -463,7 +463,7 @@ async function scheduleChores(gid) {
     for (let assigned_chore in assigned_chores) {
         const assigned_user = assigned_chore['assigned_user'];
         const token = user_info[assigned_user]['token'];
-        const event_id = addEvent(token, assigned_chore);
+        const event_id = await helpers.addEvent(token, assigned_chore);
         assigned_chore['gcal_event_id'] = event_id;
     }
 
@@ -535,3 +535,5 @@ router.get('/:gid/getCalendar', async(req, res) => {
 })
 
 module.exports = router;
+
+// TODO: mock the endpoints using the false tokens
