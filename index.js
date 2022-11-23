@@ -21,12 +21,9 @@ app.use(express.json());
 // Route Middlewares 
 app.use('/auth', authRoute);
 app.use('/roommateGroup', roommateGroupRoute);
-<<<<<<< HEAD
 app.use('/calendar', calendarRoute);
 app.use('/user', userRoute);
-=======
 app.use('/finance', financeRoute);
->>>>>>> finance
 
 const portNumber = process.env.PORT || 3000;
 app.listen(portNumber, function () {
