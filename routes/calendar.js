@@ -406,7 +406,7 @@ async function scheduleChores(gid) {
     if (doc.length < 1) {
         throw Error("No collection with the gid exists");
     }
-    const calendar = await Calendar.find({'gid': gid});
+    const calendar = await Calendar.findOne({'gid': gid});
     const chores = calendar['added_events'];
 
     let users = doc[0]['members'];
@@ -415,7 +415,7 @@ async function scheduleChores(gid) {
     // retrieve and store user info
     for (let i = 0; i < users.length; i++) {
         const uid = users[i];
-        const user = await User.find({'uid':users[i]});
+        const user = await User.findOne({'_id':users[i]});
         const token = user['gcal_token'];
         const name = user['name'];
         //call function that returns all events for user, and add to the dict of events
@@ -433,7 +433,7 @@ async function scheduleChores(gid) {
     let assigned_chores = []; // array of finalized chores
     let unassigned_chores = [];
     
-    for (let chore in chores) {
+    for (let chore of chores) {
         // pass 1: see if chore meets any of the members requirements for the preferred dates
         let assigned_chore = findMatchingUser(chore, users, user_info, chore['preferred_days']);
 
@@ -460,8 +460,8 @@ async function scheduleChores(gid) {
     }
 
     // create events in user calendars
-    for (let assigned_chore in assigned_chores) {
-        const assigned_user = assigned_chore['assigned_user'];
+    for (let assigned_chore of assigned_chores) {
+        const assigned_user = assigned_chore['associated_with'];
         const token = user_info[assigned_user]['token'];
         const event_id = await helpers.addEvent(token, assigned_chore);
         assigned_chore['gcal_event_id'] = event_id;

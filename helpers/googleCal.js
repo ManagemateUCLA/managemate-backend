@@ -42,7 +42,7 @@ module.exports.getEvents = async (userTokenJSON) => {
     const events = res.data.items;
     if (!events || events.length === 0) {
         console.log('No upcoming events found.');
-        return;
+        return [];
     }
 
     events.forEach((ele, index) => {
