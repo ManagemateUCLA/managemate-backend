@@ -1,7 +1,27 @@
 const mongoose = require('mongoose');
 
+const Event = new mongoose.Schema(
+    {
+        discordUserId: {
+            type: String,
+            required: true
+        },
+        message: {
+            type: String,
+            required: true
+        }
+
+    }
+)
+
 const roomateGroupSchema = new mongoose.Schema(
     {
+        discordServerId: {
+            type: String,
+            required: false,
+            default: ""
+        },
+
         gid: {
             type: String,
             required: true,
@@ -24,6 +44,11 @@ const roomateGroupSchema = new mongoose.Schema(
             required: false,
             min: 1,
             max: 128
+        },
+        bulletinBoard: {
+            type: [Event],
+            required: false,
+            default: []
         }
     }
 );

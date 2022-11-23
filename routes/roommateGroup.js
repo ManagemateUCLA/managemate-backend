@@ -144,6 +144,50 @@ router.post('/join', verify, async (req, res) => {
 }
 );
 
+router.post('/linkGroup', async (req, res) => {
+    const gid = req.body.gid;
+    const discordUserId = req.body.discordUserId;
+    const discordServerId = req.body.discordServerId;
+    try {
+        let userObject = await User.findOne({discordUserId: discordUserId});
+        let uid = await userObject._id;
+        // checking if this group has this user within it
+        let userInGroup = await helpers.checkUserInGroup(gid, uid);
+        if (userInGroup) {
+            // we link the roommate group id to the discord server id
+            let filter = {gid: gid};
+            let update = {discordServerId: discordServerId}
+            console.log("hi");
+            RoommateGroup.findOneAndUpdate(
+                filter,
+                update, 
+                null,
+                (error, result) => {
+                    if (error) {
+                        console.log(error)
+                        res.status(400).send(error);
+                        return;
+                    } else {
+                        console.log(result)
+                        res.status(200).send("Updated discordServerId and gid");
+                        return;
+                    }
+                }
+            )
+
+        }
+        else {
+            res.status(404).send("Unable to find the gid/permission issue");
+            return;
+        }
+
+    } catch (err) {
+        res.status(400).send(err);
+        return;
+    }
+})
+
+
 /**
  * * Removes the user from the group passed in body and updates the gid in user database 
  */

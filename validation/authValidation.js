@@ -4,7 +4,8 @@ const Joi = require('@hapi/joi');
 const registerSchema = Joi.object().keys({
     email: Joi.string().min(6).messages({'string.pattern.base': `Must be a valid email`}).required().email(),
     password: Joi.string().min(6).messages({'string.pattern.base': `Password must be more than 5 characters`}).required(),
-    name: Joi.string().min(4).messages({'string.pattern.base': `Name must be more than 3 characters`}).required()
+    name: Joi.string().min(4).messages({'string.pattern.base': `Name must be more than 3 characters`}).required(),
+    discordUserId: Joi.string().messages({"": ""}).required()
 });
 
 const loginSchema = Joi.object().keys({
