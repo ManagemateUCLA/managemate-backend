@@ -30,10 +30,6 @@ const transactionSchema = new mongoose.Schema(
         date: {
             type: Date,
             default: Date.now
-        },
-        isProcessed: {
-            type: Boolean,
-            default: false
         }
     }
 );
