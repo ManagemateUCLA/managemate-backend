@@ -468,21 +468,9 @@ async function scheduleChores(gid) {
     }
 
     // put the assignements in the db
-    Calendar.findOneAndUpdate(
+    await Calendar.findOneAndUpdate(
         {gid: gid},
         {scheduled_events: assigned_chores},
-        null,
-        (error, result) => {
-            if (error) {
-                console.log(error)
-                res.status(400).send(error)
-                return;
-            } else {
-                // console.log(result)
-                res.status(200).send("Success")
-                return;
-            }
-        }
     )
 
     return assigned_chores;
