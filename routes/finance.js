@@ -153,7 +153,7 @@ router.delete("/deleteTransaction", async (req, res) => {
     */
    let gid = req.body.gid;
    try {
-        transactions = await RoommateGroup.find({gid: gid});
+        transactions = await Transaction.find({gid: gid});
         console.log(transactions);
         res.status(200).send(transactions);
    } catch (err) {
@@ -243,7 +243,7 @@ router.get("/getBalance", async (req, res) => {
     if (!gid) {
         return res.status(400).send("No group exists with the given discordserverid"); 
     }
-    
+
     try {
         // check if the newly generated gid exists 
         let spendingGroupExists = await BalanceTable.findOne({gid: gid});

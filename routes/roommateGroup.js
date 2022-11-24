@@ -62,7 +62,7 @@ router.post('/create', verify, async (req, res) => {
             let newRoommateGroup = new RoommateGroup({
             gid: gid,
             name: reqObj.groupName,
-            members: [],
+            members: [userObj._id],
             discordlink: ""
             }); 
         
