@@ -2,10 +2,7 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
     {
-        discordUserId: {
-            type: String,
-            required: true
-        },
+       
         name: {
             type: String,
             required: true,
@@ -30,9 +27,10 @@ const userSchema = new mongoose.Schema(
         },
         gid: {
             type: String
-        }, 
-        gcal_token: {
-            type: Object
+        },
+        discordUserId: {
+            type: String,
+            required: true
         }
     }
 );
