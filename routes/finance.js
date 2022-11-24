@@ -165,11 +165,16 @@ router.delete("/deleteTransaction", async (req, res) => {
 router.post("/addMember", async (req, res) => {
     /*
         {
-            "gid": <GROUP_ID>,
+            "discordServerId": <discordServerId>,
             "members": [<USER_ID>,]
         }
     */
-    let gid = req.body.gid;
+    let discordServerId = req.body.discordServerId;
+    const gid = await generalHelpers.getGroupId(discordServerId);
+    if (!gid) {
+        return res.status(400).send("No group exists with the given discordserverid"); 
+    }
+    
     let members = req.body.members;
     try {
         let balanceTableEntry = await BalanceTable.findOne({gid: gid});
@@ -196,10 +201,15 @@ router.post("/addMember", async (req, res) => {
 router.post("/createSpendingGroup", async (req, res) => {
     /*
         {
-            "gid": <GROUP_ID>
+            "discordServerId": <GROUP_ID>
         }
     */
-    let gid = req.body.gid;
+    let discordServerId = req.body.discordServerId;
+    const gid = await generalHelpers.getGroupId(discordServerId);
+    if (!gid) {
+        return res.status(400).send("No group exists with the given discordserverid"); 
+    }
+
     try {
         // check if the newly generated gid exists 
         let spendingGroupExists = await BalanceTable.findOne({gid: gid});
@@ -228,7 +238,12 @@ router.post("/createSpendingGroup", async (req, res) => {
 });
 
 router.get("/getBalance", async (req, res) => {
-    let gid = req.body.gid;
+    let discordServerId = req.body.discordServerId;
+    const gid = await generalHelpers.getGroupId(discordServerId);
+    if (!gid) {
+        return res.status(400).send("No group exists with the given discordserverid"); 
+    }
+    
     try {
         // check if the newly generated gid exists 
         let spendingGroupExists = await BalanceTable.findOne({gid: gid});
