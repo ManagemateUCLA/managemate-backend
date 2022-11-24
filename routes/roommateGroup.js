@@ -111,8 +111,8 @@ router.post('/join', verify, async (req, res) => {
     }
 
     let checkUserIsInGroup = await helpers.checkUserInGroup(groupId, userId);
-    if (!checkUserIsInGroup) {
-        return res.status(400).send("User is already in teh group")
+    if (checkUserIsInGroup) {
+        return res.status(400).send("User is already in the group")
     }
 
     // add user to the group
