@@ -201,7 +201,7 @@ router.post("/addMember", async (req, res) => {
 router.post("/createSpendingGroup", async (req, res) => {
     /*
         {
-            "discordServerId": <GROUP_ID>
+            "discordServerId": discordServerId
         }
     */
     let discordServerId = req.body.discordServerId;
@@ -237,7 +237,7 @@ router.post("/createSpendingGroup", async (req, res) => {
     }
 });
 
-router.get("/getBalance", async (req, res) => {
+router.post("/getBalance", async (req, res) => {
     let discordServerId = req.body.discordServerId;
     const gid = await generalHelpers.getGroupId(discordServerId);
     if (!gid) {
