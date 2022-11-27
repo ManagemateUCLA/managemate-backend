@@ -9,6 +9,7 @@ async function loadSavedCredentialsIfExist(userTokenJSON) {
     try {
       return google.auth.fromJSON(userTokenJSON);
     } catch (err) {
+        console.log(err);
       return null;
     }
 }
