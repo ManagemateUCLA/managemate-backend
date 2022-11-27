@@ -407,6 +407,9 @@ async function scheduleChores(gid) {
         throw Error("No collection with the gid exists");
     }
     const calendar = await Calendar.findOne({'gid': gid});
+
+    const prev_scheduled_chores = calendar['scheduled_events'];
+    await deleteEvents(prev_scheduled_chores);
     const chores = calendar['added_events'];
 
     let users = doc[0]['members'];
@@ -474,6 +477,18 @@ async function scheduleChores(gid) {
     )
 
     return assigned_chores;
+}
+
+async function deleteEvents(events) {
+    for (const event of events) {
+        let uid = event.associated_with;
+        let event_id = event.gcal_event_id;
+        let user_info = await User.findOne({uid: uid});
+        let user_token = user_info["gcal_token"];
+        console.log(user_info);
+        console.log(user_token);
+        await helpers.deleteEvent(user_token, event_id);
+    }
 }
 
 router.get('/:gid/getCalendar', async(req, res) => {

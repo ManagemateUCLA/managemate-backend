@@ -31,7 +31,8 @@ const userSchema = new mongoose.Schema(
         discordUserId: {
             type: String,
             required: true
-        }
+        },
+        gcal_token: Object
     }
 );
 
