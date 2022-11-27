@@ -145,7 +145,7 @@ router.delete("/deleteTransaction", async (req, res) => {
  * GET 
  * Gets all transactions of a given group as a sorted list
  */
- router.get("/getTransactions", async (req, res) => {
+ router.post("/getTransactions", async (req, res) => {
     /*
         {
             "gid": <GROUP_ID>
