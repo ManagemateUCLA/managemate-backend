@@ -40,10 +40,12 @@ router.post('/addEvent', async (req, res) => {
         let discordUserId = req.body.discordUserId;
         let discordServerId = req.body.discordServerId;
         let message = req.body.message;
+        let user_name = helpers.getNameFromDiscordUsername(discordUserId);
 
         let event = {
             discordUserId: discordUserId,
-            message: message
+            message: message,
+            name: user_name
         }
 
         try {
