@@ -102,4 +102,16 @@ const gCal = require('../helpers/googleCal');
     }
 });
 
+router.get('/checkUserInGroup', verify, async (req, res) => {
+    try {
+        let userinfo = await User.findOne({_id: req.user._id});
+        let gid = userinfo.gid;
+        if (!gid)
+            return res.status(200).send({gid: null});
+        console.log(gid);
+        return res.status(200).send({gid: gid});
+    } catch(err) {
+        return res.status(400).send({message: err});
+    }
+});
 module.exports = router;
