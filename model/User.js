@@ -34,7 +34,8 @@ const userSchema = new mongoose.Schema(
         },
         gcal_refresh_token: {
             type: String, 
-            required: true
+            required: false,
+            default: ""
         }
     }
 );
