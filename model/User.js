@@ -32,7 +32,10 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        gcal_token: Object
+        gcal_refresh_token: {
+            type: String, 
+            required: true
+        }
     }
 );
 

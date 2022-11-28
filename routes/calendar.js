@@ -418,8 +418,8 @@ async function scheduleChores(gid) {
     // retrieve and store user info
     for (let i = 0; i < users.length; i++) {
         const uid = users[i];
-        const user = await User.findOne({'_id':users[i]});
-        const token = user['gcal_token'];
+        const user = await User.findOne({'_id':uid});
+        const token = user['gcal_refresh_token'];
         const name = user['name'];
         //call function that returns all events for user, and add to the dict of events
         const events = await helpers.getEvents(token);
@@ -484,7 +484,7 @@ async function deleteEvents(events) {
         let uid = event.associated_with;
         let event_id = event.gcal_event_id;
         let user_info = await User.findOne({uid: uid});
-        let user_token = user_info["gcal_token"];
+        let user_token = user_info["gcal_refresh_token"];
         console.log(user_info);
         console.log(user_token);
         await helpers.deleteEvent(user_token, event_id);
