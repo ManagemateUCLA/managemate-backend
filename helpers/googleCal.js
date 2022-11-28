@@ -15,7 +15,13 @@ async function loadSavedCredentialsIfExist(userTokenJSON) {
 }
 
 
-module.exports.getEvents = async (userTokenJSON) => {
+module.exports.getEvents = async (refresh_token) => {
+    let userTokenJSON = {
+        type: "authorized_user",
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        refresh_token: refresh_token
+    }
     let auth = await loadSavedCredentialsIfExist(userTokenJSON);
     if (!auth) {
         console.log("auth token issue");
@@ -60,7 +66,14 @@ module.exports.getEvents = async (userTokenJSON) => {
 }
 
 
-module.exports.addEvent = async (userTokenJSON, event) => {
+module.exports.addEvent = async (refresh_token, event) => {
+    console.log("TOKEN", refresh_token);
+    let userTokenJSON = {
+        type: "authorized_user",
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        refresh_token: refresh_token
+    }
     let auth = await loadSavedCredentialsIfExist(userTokenJSON);
     if (!auth) {
         console.log("auth token issue");
@@ -90,7 +103,13 @@ module.exports.addEvent = async (userTokenJSON, event) => {
     return eventID;
 }
 
-module.exports.deleteEvent = async (userTokenJSON, eventID) => {
+module.exports.deleteEvent = async (refresh_token, eventID) => {
+    let userTokenJSON = {
+        type: "authorized_user",
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        refresh_token: refresh_token
+    }
     let auth = await loadSavedCredentialsIfExist(userTokenJSON);
     if (!auth) {
         console.log("auth token issue");
