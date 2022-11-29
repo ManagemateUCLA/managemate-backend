@@ -79,7 +79,7 @@ router.post('/:discordId/createChore',  async (req, res) => {
 router.delete('/:discordId/deleteChore', async(req, res) => {
     try {
         let discordId = req.params['discordId'];
-        let gid = generalHelpers.getGroupId(discordId);
+        let gid = await generalHelpers.getGroupId(discordId);
         let chore_id = req.query['choreid'];
         
         // delete by chore id
@@ -113,7 +113,7 @@ router.delete('/:discordId/deleteChore', async(req, res) => {
 router.get('/:discordId/getChores', async(req,res) => {
     try{
         let discordId = req.params['discordId'];
-        let gid  = generalHelpers.getGroupId(discordId);
+        let gid  = await generalHelpers.getGroupId(discordId);
         Calendar.find({'gid':gid}, (error, result)=>{
             if (error) {
                 console.log(error)
