@@ -257,8 +257,9 @@ router.post("/getBalance", async (req, res) => {
     }
 });
 
-router.get("/test", async (req, res) => {
+router.post("/parseReceipt", async (req, res) => {
     try {
+        let imageLink = req.body.imageLink;
         const Client = require('@veryfi/veryfi-sdk');
         const client_id = 'vrf9TsH9vBxiYt8M2ysbN6yOjt2glFFZ5AJca7h';
         const client_secret = 'pxzkLWHYcpSwD8UbEnOfJzlWy9hJ4ryTKm1luMlCOHjc73wpuuF4mtgwSyDedz3f9JMBIjareww16lu8TvZWRKZTJW5mBF4KYYMArsXoZd6e5nTbdKNlu8t9YglW0GP7';
@@ -266,10 +267,11 @@ router.get("/test", async (req, res) => {
         const api_key = '510faa8be572222599d0daa954b12d63';
         
         const cat = ['Grocery', 'Utilities', 'Travel'];
-        const file_path = './images/test2.jpg';
+        // const file_path = './images/test2.jpg';
         let veryfi_client = new Client(client_id, client_secret, username, api_key);
-        let resp = await veryfi_client.process_document(file_path, categories=cat);
-        let items = resp.line_items;
+        let response = await veryfi_client.process_document_url(imageLink);
+        console.log(response);
+        let items = response.line_items;
         let result = [];
         for(let obj of items) {
             let unitTransaction = {
