@@ -32,7 +32,7 @@ describe('/POST Create chore', () => {
           })
     })
 
-    chore['name'] = 'Sweepig';
+    
 
 
 })
