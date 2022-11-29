@@ -4,7 +4,8 @@ const RoommateGroup = require('../model/RoommateGroup');
 const User = require('../model/User');
 const Calendar = require('../model/Calendar');
 const constants = require('../constants');
-const helpers = require('../helpers/googleCal');
+const gcalHelpers = require('../helpers/googleCal');
+const generalHelpers = require('../helpers/general');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { response } = require('express');
@@ -26,11 +27,12 @@ const day_index = {
     "Saturday": 6
 }
 
-router.post('/:gid/createChore',  async (req, res) => {
+router.post('/:discordId/createChore',  async (req, res) => {
     // console.log(req.body);
     // console.log(req);
     try {
-        let gid = req.params['gid'];
+        let discordId = req.params['discordId'];
+        let gid = await generalHelpers.getGroupId(discordId);
         let task_name = req.body['name'];
         let duration = req.body['duration'];
         let preferred_days = req.body['preferred_days'];
@@ -74,9 +76,10 @@ router.post('/:gid/createChore',  async (req, res) => {
 }
 );
 
-router.delete('/:gid/deleteChore', async(req, res) => {
+router.delete('/:discordId/deleteChore', async(req, res) => {
     try {
-        let gid = req.params['gid'];
+        let discordId = req.params['discordId'];
+        let gid = generalHelpers.getGroupId(discordId);
         let chore_id = req.query['choreid'];
         
         // delete by chore id
@@ -107,9 +110,10 @@ router.delete('/:gid/deleteChore', async(req, res) => {
     }
 });
 
-router.get('/:gid/getChores', async(req,res) => {
+router.get('/:discordId/getChores', async(req,res) => {
     try{
-        let gid  = req.params['gid'];
+        let discordId = req.params['discordId'];
+        let gid  = generalHelpers.getGroupId(discordId);
         Calendar.find({'gid':gid}, (error, result)=>{
             if (error) {
                 console.log(error)
@@ -422,7 +426,7 @@ async function scheduleChores(gid) {
         const token = user['gcal_refresh_token'];
         const name = user['name'];
         //call function that returns all events for user, and add to the dict of events
-        const events = await helpers.getEvents(token);
+        const events = await gcalHelpers.getEvents(token);
 
         const curr_user_info = {
             name: name,
@@ -466,7 +470,7 @@ async function scheduleChores(gid) {
     for (let assigned_chore of assigned_chores) {
         const assigned_user = assigned_chore['associated_with'];
         const token = user_info[assigned_user]['token'];
-        const event_id = await helpers.addEvent(token, assigned_chore);
+        const event_id = await gcalHelpers.addEvent(token, assigned_chore);
         assigned_chore['gcal_event_id'] = event_id;
     }
 
@@ -487,7 +491,7 @@ async function deleteEvents(events) {
         let user_token = user_info["gcal_refresh_token"];
         console.log(user_info);
         console.log(user_token);
-        await helpers.deleteEvent(user_token, event_id);
+        await gcalHelpers.deleteEvent(user_token, event_id);
     }
 }
 
