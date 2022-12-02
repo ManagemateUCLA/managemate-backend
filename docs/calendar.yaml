@@ -14,7 +14,7 @@ components:
     properties: 
       name:
         type: string
-      time_of_day_start:
+      start:
         type: string   # time in HH:MM. 24 hour
       duration:
         type: number   # in minutes, must be included if time_of_day_start is specified
@@ -22,24 +22,22 @@ components:
         type: array    # array of days of the week
         items:
           type: string
-      id:
-        type: string   # not to be specified on creation request
         
   Event:
     type: object
     properties:
       name: 
         type: string
-      day:
-        type: string
-      start_time:
-        type: string  # time in HH:MM. 24 hour
-      duration:
-        type: number # in minutes
+      start:
+        type: string  
+      end:
+        type: string # in minutes
       associated_with:
         type: string  # id
       associated_with_name:
         type: string
+      gcal_event_id:
+        type: string  
     
   Calendar: 
     type: object
@@ -57,13 +55,14 @@ components:
 
 paths:
 # ----------- Chore APIs --------------
-  /calendar/{gid}/createChore:
+  /calendar/{serverId}/createChore:
     post:
           description: Create a new chore
           parameters:
-            - name: gid
+            - name: serverId
               in: path
               required: true
+              description: Server ID of the discord server
               schema:
                 type: string
           requestBody:
@@ -86,13 +85,14 @@ paths:
                       message:
                         type: string
 
-  /calendar/{gid}/getChores:
+  /calendar/{serverId}/getChores:
     get:
       description: Get a list of all the chores
       parameters:
-        - name: gid
+        - name: serverId
           in: path
           required: true
+          description: Server ID of the discord server
           schema:
             type: string
       responses:
@@ -101,7 +101,10 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chore'
+                  
         '400':
           description: Invalid request
           content:
@@ -112,13 +115,14 @@ paths:
                   message:
                     type: string
 
-  /calendar/{gid}/deleteChore:
+  /calendar/{serverId}/deleteChore:
     delete:
       description: Delete chore
       parameters:
-        - name: gid
+        - name: serverId
           in: path
           required: true
+          description: Server ID of the discord server 
           schema:
             type: string
         - name: choreid
@@ -160,7 +164,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Calendar'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
         '400':
           description: Invalid request
           content:
@@ -171,25 +177,5 @@ paths:
                   message:
                     type: string
 
-  /calendar/{gid}/resetCalendar:
-    post:
-      description: Reset calendar based on new changes
-      parameters:
-        - name: gid
-          in: path
-          required: true
-          schema: 
-            type: string
-      responses:
-        '200':
-          description: Successfully updated calendar
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:   
-                  message:
-                    type: string
+
 

@@ -29,10 +29,6 @@ router.post("/register", async (req, res) => {
     // Hash the passwords
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
-    var test = new Map();
-    test.set("a", [1, 2, 3]);
-    var table = new Map();
-
 
     // Create a User
     const user = new User({
@@ -45,7 +41,11 @@ router.post("/register", async (req, res) => {
 
     try {
         const savedUser = await user.save();
-        res.send({ user: user._id });
+        const token = jwt.sign(
+            { _id: user._id, name: user.name, email: user.email },
+            process.env.TOKEN_SECRET
+        );
+        res.send({ token: token });
     } catch (err) {
         res.status(400).send(err);
     }
@@ -76,6 +76,7 @@ router.post("/login", async (req, res) => {
 
     res.send({token: token});
 });
+
 
 // router.post("/test", async (req, res) => {
 //     // Lets Validate the data before we a user

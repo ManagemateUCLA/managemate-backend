@@ -58,3 +58,13 @@ module.exports.checkDiscordUserInDiscordServer = async (discordServerId, discord
         return false;
     }
 }
+
+module.exports.getNameFromDiscordUsername = async (discordUsername) => {
+    try {
+        let userInfo = await User.findOne({discordUserId: discordUsername});
+        return userInfo["name"];
+
+    } catch(err) {
+        return null;
+    }
+}

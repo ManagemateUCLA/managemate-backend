@@ -1,4 +1,5 @@
 const express = require('express');
+var cors = require('cors')
 const app = express();
 const dotenv = require('dotenv');
 const connectDB = require("./db");
@@ -13,6 +14,7 @@ const bulletinBoardRoute = require('./routes/bulletinBoard');
 
 dotenv.config();
 
+app.use(cors())
 // connect to DB 
 connectDB();
 
