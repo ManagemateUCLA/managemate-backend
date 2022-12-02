@@ -82,15 +82,49 @@ paths:
                   message:
                     type: string
 
-  /finance/{gid}/getBalance:
-    get:
+  /finance/deleteTransaction:
+    delete:
+      description: Delete an existing transaction 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object 
+              required:
+                - tid 
+              properties:
+                tid:
+                  type: string
+            
+      responses:
+        '200':
+          description: Successfully deleted the transaction 
+        
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:   
+                  message:
+                    type: string
+
+  /finance/getBalance:
+    post:
       description: gets the current group balance by simplfying debts  
-      parameters:
-        - name: gid
-          in: path
-          required: true
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object 
+              required:
+                - discordServerId 
+              properties:
+                discordServerId:
+                  type: string
       responses:
         '200':
           description: Successfully returned a map of balances -> Map(lender, Map(borrower, amount))
@@ -115,3 +149,59 @@ paths:
                 properties:   
                   message:
                     type: string
+
+  /finance/createSpendingGroup:
+      post:
+        description: creates a spending group when setting up the discord server
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema: 
+                type: object 
+                required:
+                  - discordServerId 
+                properties:
+                  discordServerId:
+                    type: string
+        responses:
+          '200':
+            description: Successfully created a spending group table
+
+          '400':
+            description: Invalid request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:   
+                    message:
+                      type: string
+  /finance/addMember:
+      post:
+        description: adds a member to the spending group at the time of and after server creation 
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema: 
+                type: object 
+                required:
+                  - discordServerId 
+                properties:
+                  discordServerId:
+                    type: string
+        responses:
+          '200':
+            description: Successfully created a spending group table
+
+          '400':
+            description: Invalid request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:   
+                    message:
+                      type: string
+  
