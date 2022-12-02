@@ -97,7 +97,7 @@ router.delete('/:discordId/deleteChore', async(req, res) => {
                     res.status(400).send(error)
                     return;
                 } else {
-                    console.log(result)
+                    // console.log(result)
                     if (result.modifiedCount == 0) {
                         res.status(404).send("Not found chore to delete");
                     } else {
@@ -123,7 +123,7 @@ router.get('/:discordId/getChores', async(req,res) => {
                 console.log(error)
                 res.status(400).send(error)
             } else {                
-                console.log(result);
+                // console.log(result);
                 if (result.length < 1) {
                     //TODO: think about updating this response number and object
                     res.status(400).send({message: "No events to display"});
@@ -556,8 +556,6 @@ async function deleteEvents(events) {
         let event_id = event.gcal_event_id;
         let user_info = await User.findOne({uid: uid});
         let user_token = user_info["gcal_refresh_token"];
-        console.log(user_info);
-        console.log(user_token);
         await gcalHelpers.deleteEvent(user_token, event_id);
     }
 }
