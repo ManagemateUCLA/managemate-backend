@@ -34,6 +34,10 @@ router.post('/:discordId/createChore',  async (req, res) => {
         let discordId = req.params['discordId'];
         let gid = await generalHelpers.getGroupId(discordId);
         let task_name = req.body['name'];
+        if (!task_name) {
+            return res.status(400).send();
+        }
+
         let duration = req.body['duration'];
         let preferred_days = req.body['preferred_days'];
         let event_object;
@@ -93,7 +97,7 @@ router.delete('/:discordId/deleteChore', async(req, res) => {
                     res.status(400).send(error)
                     return;
                 } else {
-                    console.log(result)
+                    // console.log(result)
                     if (result.modifiedCount == 0) {
                         res.status(404).send("Not found chore to delete");
                     } else {
@@ -119,7 +123,7 @@ router.get('/:discordId/getChores', async(req,res) => {
                 console.log(error)
                 res.status(400).send(error)
             } else {                
-                console.log(result);
+                // console.log(result);
                 if (result.length < 1) {
                     //TODO: think about updating this response number and object
                     res.status(400).send({message: "No events to display"});
@@ -135,6 +139,12 @@ router.get('/:discordId/getChores', async(req,res) => {
     }
 });
 
+/**
+ * Move index in list to the end of the list
+ * @param {list} arr 
+ * @param {number} index 
+ * @returns updated list
+ */
 function moveIndexToEnd(arr, index) {
     if (index > -1) {
         let val = arr[index];
@@ -145,6 +155,11 @@ function moveIndexToEnd(arr, index) {
     return arr;
 }
 
+/**
+ * Checks if a string is in HH:MM format
+ * @param {string} input 
+ * @returns boolean
+ */
 function isCorrectTimeFormat(input) {
     if (input.length != 5 || input[2] != ':' || 
         !('0' <= input[0] && input[0] <= '2') ||
@@ -158,6 +173,12 @@ function isCorrectTimeFormat(input) {
     return true;
 }
 
+/**
+ * Returns the later of two dates
+ * @param {Date} date1 
+ * @param {Date} date2 
+ * @returns 
+ */
 function dateMax(date1, date2) {
     if (date1 <= date2) {
         return date2;
@@ -165,7 +186,11 @@ function dateMax(date1, date2) {
     return date1;
 }
 
-
+/**
+ * Function to combine overlapping or adjacent events into a single event
+ * @param {List} intervals List of events 
+ * @returns A merged list of events 
+ */
 function mergeEvents(intervals) {
     intervals.sort((a, b) => a.start.getTime() - b.start.getTime())
     const res = [intervals[0]]
@@ -180,8 +205,12 @@ function mergeEvents(intervals) {
     return res
 };
 
-// no events should be scheduled between 8pm and 8am, so this function makes night an event by blocking it off
+/**
+ * Insert the night as events in the event list by blocking off times between 8pm and 8am
+ * @param {List} event_list List of existing events
+ */
 function blockOffNights(event_list) {
+    // no events should be scheduled between 8pm and 8am, so this function makes night an event by blocking it off
     let rn = new Date();
 
     let today_morning_start = new Date(rn);
@@ -222,6 +251,11 @@ function blockOffNights(event_list) {
 
 }
 
+/**
+ * Parse a string in HH:MM time format
+ * @param {String} chore_time_string Input string 
+ * @returns A dictionary of the hours and minutes
+ */
 function parseChoreTime(chore_time_string) {
     const hr_str = chore_time_string[0] + chore_time_string[1];
     const min_str = chore_time_string[3] + chore_time_string[4];
@@ -231,7 +265,10 @@ function parseChoreTime(chore_time_string) {
     return storage_object;
 }
 
-// function responsible to merge events that are overlapping and returns events mapped by day
+/**
+ * Go through the event list and get events per day
+ * @param {list} event_list List of events
+ */
 function parseEventList(event_list) {
 
     blockOffNights(event_list);
@@ -303,8 +340,12 @@ function parseEventList(event_list) {
     return day_bucket;
 }
 
-
-
+/**
+ * Find an available time for a chore in a list of events for a single day
+ * @param {dict} chore Chore object
+ * @param {list} events List of events
+ * @returns chore assigned in available time slot. null if no such time exists 
+ */
 function findTimeInDay(chore, events) {
     // it is assumed that the beginning and end of the day
     // is already blocked off due to it being a night
@@ -360,6 +401,13 @@ function findTimeInDay(chore, events) {
     return null;
 }
 
+/**
+ * Find an available time between the list of events specifically for the days of the week specified
+ * @param {dict} chore Chore object
+ * @param {list} event_list List of event objects
+ * @param {list} days_to_search List of days to be searched
+ * @returns Chore with assigned start and end time. Null if chore could not be assigned.
+ */
 function findAvailableTime(chore, event_list, days_to_search) {
 
 
@@ -385,6 +433,14 @@ function findAvailableTime(chore, event_list, days_to_search) {
 
 }
 
+/**
+ * Go through each user and see if a chore matches or not in their schedules
+ * @param {dict} chore Chore object
+ * @param {list} user_list List of users
+ * @param {dict} user_info Associated info for each user
+ * @param {list} days_to_search List of days to search
+ * @returns Chore object with associated name. Null if the chore could not be assigned.
+ */
 function findMatchingUser(chore, user_list, user_info, days_to_search = days_of_the_week) {
     for (let i = 0; i < user_list.length; i++) {
         let user = user_list[i];
@@ -402,8 +458,15 @@ function findMatchingUser(chore, user_list, user_info, days_to_search = days_of_
     return null;
 }
 
-// caller function must take care of any errors thrown
+/**
+ * Assign requested chores for a group by going through each user's calendars and finding 
+ * times available to schedule chores that work in everybody's schedules and is equally
+ * divided between users
+ * @param {string} gid Group id
+ * @returns List of assigned chores with times and people a chore is associated with
+ */
 async function scheduleChores(gid) {
+    // caller function must take care of any errors thrown
 
     // get all the users
     const doc =  await RoommateGroup.find({'gid': gid});
@@ -483,14 +546,16 @@ async function scheduleChores(gid) {
     return assigned_chores;
 }
 
+/**
+ * Go through each event and delete it from the associated user's google calendar
+ * @param {List} events Events to delete
+ */
 async function deleteEvents(events) {
     for (const event of events) {
         let uid = event.associated_with;
         let event_id = event.gcal_event_id;
         let user_info = await User.findOne({uid: uid});
         let user_token = user_info["gcal_refresh_token"];
-        console.log(user_info);
-        console.log(user_token);
         await gcalHelpers.deleteEvent(user_token, event_id);
     }
 }
@@ -504,43 +569,6 @@ router.get('/:gid/getCalendar', async(req, res) => {
         res.json({message: err});
     }
 
-    // // TODO: remove. only here for unit testing
-
-    // const chore = {
-    //     name: 'alibaba',
-    //     duration: 30,
-    //     preferred_days: ['Tuesday']
-    // };
-
-    // const users = ['someid', 'otherid'];
-
-    // const user_info = {
-    //     'someid' : {
-    //         'name' : 'Ya Baba',
-    //         'events' : [
-    //             {
-    //                 'name': 'Fly',
-    //                 'start': new Date('November 22, 2022 08:00:00'),
-    //                 'end': new Date('November 22, 2022 19:40:00')
-    //             }
-    //         ]
-    //     },
-    //     'otherid': {
-    //         'name': 'brodi',
-    //         'events': [
-    //             {
-    //                 'name': 'Swim',
-    //                 'start': new Date('November 22, 2022 08:00:00'),
-    //                 'end': new Date('November 22, 2022 19:50:00')
-    //             }
-    //         ]
-    //     }
-    // }
-    // let ret = findMatchingUser(chore, users, user_info);
-    // res.status(200).send(ret);
-
 })
 
 module.exports = router;
-
-// TODO: mock the endpoints using the false tokens

@@ -36,7 +36,8 @@ describe('/POST Register User', () => {
         let user = {
             "email": test_email,
             "password": test_password,
-            "name": test_name
+            "name": test_name,
+            "discordUserId":"Test#123"
         }
       chai.request('http://localhost:3000')
           .post('/auth/register')

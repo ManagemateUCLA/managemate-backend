@@ -37,8 +37,8 @@ module.exports.getEvents = async (refresh_token) => {
     timeMax.setHours(0,0,0,0);
     timeMax.setDate(timeMax.getDate() + 7);
 
-    console.log("timeMin", timeMin);
-    console.log("timeMax", timeMax);
+    // console.log("timeMin", timeMin);
+    // console.log("timeMax", timeMax);
 
     const res = await calendar.events.list({
         calendarId: 'primary',
@@ -67,7 +67,7 @@ module.exports.getEvents = async (refresh_token) => {
 
 
 module.exports.addEvent = async (refresh_token, event) => {
-    console.log("TOKEN", refresh_token);
+    // console.log("TOKEN", refresh_token);
     let userTokenJSON = {
         type: "authorized_user",
         client_id: process.env.CLIENT_ID,
