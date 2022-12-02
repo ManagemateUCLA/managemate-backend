@@ -9,6 +9,12 @@ const jwt = require('jsonwebtoken');
 const { response } = require('express');
 const verify = require("./verifyJWTToken");
 
+/**
+ * * adds an the event to a particular user's calendar
+ * @param refresh_token string used by google for creating a calendar user token object
+ * @param event the event to be added to the user's google calendar
+ * @return created event's id
+ */
 
 router.get('/', verify, async (req, res) => {
     try{
@@ -142,7 +148,7 @@ router.delete('/deleteEvent', async (req, res) => {
     }
 
     catch(err){
-        res.json({message: err});
+        res.status(400).json({message: err});
         return;
     }
 });

@@ -563,10 +563,12 @@ async function deleteEvents(events) {
 router.get('/:gid/getCalendar', async(req, res) => {
     try {
         let gid = req.params['gid'];
+        console.log("gid", gid);
         let assigned_chores = await scheduleChores(gid);
+        console.log("assigned chores", assigned_chores);
         res.status(200).send(assigned_chores);
     } catch(err) {
-        res.json({message: err});
+        res.status(400).json({message: err});
     }
 
 })

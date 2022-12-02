@@ -4,6 +4,11 @@ const process = require('process');
 const {authenticate} = require('@google-cloud/local-auth');
 const {google} = require('googleapis');
 
+/**
+ * * Loads credentials
+ * @param userTokenJSON token object used by google for creation of a calendar api client
+ * @return google client from the calendar api
+ */
 
 async function loadSavedCredentialsIfExist(userTokenJSON) {
     try {
@@ -14,6 +19,12 @@ async function loadSavedCredentialsIfExist(userTokenJSON) {
     }
 }
 
+
+/**
+ * * gets all the events of a particular user for the next 7 days of their life
+ * @param refresh_token string used by google for creating a calendar user token object
+ * @return list of events in Mongo Schema
+ */
 
 module.exports.getEvents = async (refresh_token) => {
     let userTokenJSON = {
@@ -65,9 +76,14 @@ module.exports.getEvents = async (refresh_token) => {
     return events
 }
 
+/**
+ * * adds an the event to a particular user's calendar
+ * @param refresh_token string used by google for creating a calendar user token object
+ * @param event the event to be added to the user's google calendar
+ * @return created event's id
+ */
 
 module.exports.addEvent = async (refresh_token, event) => {
-    // console.log("TOKEN", refresh_token);
     let userTokenJSON = {
         type: "authorized_user",
         client_id: process.env.CLIENT_ID,
@@ -103,6 +119,15 @@ module.exports.addEvent = async (refresh_token, event) => {
     return eventID;
 }
 
+
+/**
+ * * deletes an the event to a particular user's calendar
+ * @param refresh_token string used by google for creating a calendar user token object
+ * @param eventID the event to be deleted from the user's google calendar
+ * @return successful or wrongful deletion
+ */
+
+
 module.exports.deleteEvent = async (refresh_token, eventID) => {
     let userTokenJSON = {
         type: "authorized_user",
@@ -117,11 +142,15 @@ module.exports.deleteEvent = async (refresh_token, eventID) => {
     }
 
     const calendar = google.calendar({version: 'v3', auth});
-    let resp = await calendar.events.delete({
-      auth: auth,
-      calendarId: 'primary',
-      eventId: eventID
-    });
+    try {
+        let resp = await calendar.events.delete({
+        auth: auth,
+        calendarId: 'primary',
+        eventId: eventID
+        });
+    } catch(err) {
+        return false;
+    }
 
     return true;
 }
