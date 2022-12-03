@@ -16,6 +16,7 @@ let invalid_email = process.env.INVALID_USER_EMAIL;
 let test_jwt_token = process.env.TEST_JWT_TOKEN;
 let test_gid = process.env.TEST_GID;
 
+
 describe('/POST Register User', () => {
     it('Registering a user requires name', (done) => {
         let user = {
@@ -124,62 +125,6 @@ describe('/POST Roommate Group join', () => {
           .end((err, res) => {
                 res.should.have.status(400);
                 res.text.should.be.eq('GID is required to join group');
-            done();
-          });
-    });
-});
-
-describe('/GET BulletinBoard', () => {
-    it('test jwt token is needed to get bulletin board info', (done) => {
-      chai.request('http://localhost:3000')
-          .get('/bulletinBoard/')
-          .send(group)
-          .end((err, res) => {
-                res.should.have.status(400);
-            done();
-          });
-    });
-});
-
-
-describe('/GET BulletinBoard', () => {
-    it('discord user id and discord server id needed to get bulletin board info', (done) => {
-        let group = {
-        }
-      chai.request('http://localhost:3000')
-          .post('/bulletinBoard/')
-          .set('auth-token', test_jwt_token)
-          .send(group)
-          .end((err, res) => {
-                res.should.have.status(400);
-            done();
-          });
-    });
-});
-
-describe('/POST Bulletin Board Adding Message', () => {
-    it('adding event needs discord user id, server id and a message', (done) => {
-        let discordDeets = {
-        }
-      chai.request('http://localhost:3000')
-          .post('/bulletinBoard/addEvent')
-          .send(discordDeets)
-          .end((err, res) => {
-                res.should.have.status(400);
-            done();
-          });
-    });
-});
-
-describe('/POST Bulletin Board deleting Message', () => {
-    it('deleting event needs discord user id, server id and an event id', (done) => {
-        let discordDeets = {
-        }
-      chai.request('http://localhost:3000')
-          .delete('/bulletinBoard/deleteEvent')
-          .send(discordDeets)
-          .end((err, res) => {
-                res.should.have.status(400);
             done();
           });
     });

@@ -9,12 +9,7 @@ const jwt = require('jsonwebtoken');
 const { response } = require('express');
 const verify = require("./verifyJWTToken");
 
-/**
- * * adds an the event to a particular user's calendar
- * @param refresh_token string used by google for creating a calendar user token object
- * @param event the event to be added to the user's google calendar
- * @return created event's id
- */
+
 
 router.get('/', verify, async (req, res) => {
     try{
@@ -38,8 +33,10 @@ router.post('/', async (req, res) => {
     try{
         const discordUserId = req.body.discordUserId;
         const discordServerId = req.body.discordServerId;
+        console.log("ARIIIIIII");
         console.log(req.body)
         let userInGroup = await helpers.checkDiscordUserInDiscordServer(discordServerId, discordUserId);
+        console.log("userInGroup", userInGroup);
         if (userInGroup) {
             try {
                 groupDetails = await RoommateGroup.findOne({discordServerId: discordServerId});

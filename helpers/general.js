@@ -50,9 +50,10 @@ module.exports.checkDiscordUserInDiscordServer = async (discordServerId, discord
         if (!roommateGroup)
             return false
         let members = roommateGroup.members;
-        console.log(members);
+        console.log("members", members);
         let userObject = await User.findOne({discordUserId: discordUserId});
         let uid = userObject._id;
+        console.log("uid", uid);
         return members.includes(uid);
     } catch (err) {
         return false;
