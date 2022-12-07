@@ -16,6 +16,22 @@ CLIENT_ID= <google calendar api client id>
 CLIENT_SECRET= <google calendar api client secret>
 REDIRECT_URI=http://localhost:3000/authorizedCalendar
 PORT=3000
+TEST_USER_NAME=<test username>
+TEST_USER_EMAIL=<test email>
+TEST_USER_PASSWORD=<test password>
+INVALID_USER_EMAIL=<invalid username>
+TEST_JWT_TOKEN=<test jwt token>
+TEST_GID=<test gid>
+TEST_DISCORD_SERVER_ID=<test server>
+TEST_DISCORD_USER_ID="Test#123"
+```
+## Testing
+External Requirements: .ENV file as described above
+
+Enter the project repo and run:
+```bash
+npm install
+npm run test
 ```
 
 This will run the backend on localhost:3000

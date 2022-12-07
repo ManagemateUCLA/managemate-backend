@@ -21,6 +21,43 @@ components:
         
         
 paths:
+  /board:
+    get: 
+      description: Get details of the Bulletin Board for a particular gid, with JWT sent to ensure we are within a login session
+      parameters:
+        - in: header
+          name: JWT Token
+          content: 
+            string:
+              schema:
+                type: string
+                properties:   
+                  message:
+                    type: string
+      responses:
+        '200':
+          description: Successfully returned all the events on a bulletin board
+
+    post: 
+      description: Get details of the Bulletin Board for a particular gid, with JWT sent to ensure we are within a login session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                discourdUserId: 
+                  type: string
+                  example: "test#123"
+                discordServerId: 
+                  type: string
+                  example: "18097086956959"
+           
+      
+      responses:
+        '200':
+          description: Successfully returned all the events on a bulletin board
+      
   /board/addEvent:
     post:
       description: Add a new event for the bulletin board
@@ -29,10 +66,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Event'
+              properties:
+                discourdUserId: 
+                  type: string
+                  example: "test#123"
+                discordServerId: 
+                  type: string
+                  example: "18097086956959"
+                message:
+                  type: string
+                  example: "Testing Bulletin Board"
       responses:
         '200':
-          description: Successfully added the event for the Bulletin Board for a specific gid
+          description: Successfully added the event for the Bulletin Board for a specific roommate group on the basis of our discord server id
         '400':
           description: Invalid request
           content:
@@ -42,34 +88,26 @@ paths:
                 properties:   
                   message:
                     type: string
-                    
-  /board:
-    get: 
-      description: Get details of the Bulletin Board for a particular gid, with JWT sent to ensure we are within a login session
-      parameters:
-        - in: query
-          name: fields
-          style: deepObject
-          allowReserved: true
-      
-      responses:
-        '200':
-          description: Successfully returned all the events on a bulletin board
-      
-
   /board/deleteEvent:
-    post:
-      description: Add a new expense or record a mutual payment 
+    delete:
+      description: Delete an event from the bulletin board
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Event'
+              properties:
+                discourdUserId: 
+                  type: string
+                  example: "test#123"
+                discordServerId: 
+                  type: string
+                  example: "18097086956959"
+                eventId:
+                  type: string
+                  example: "986969"
       responses:
         '200':
-          description: Successfully added the transaction 
-        
+          description: Successfully added the event for the Bulletin Board for a specific roommate group on the basis of our discord server id
         '400':
           description: Invalid request
           content:

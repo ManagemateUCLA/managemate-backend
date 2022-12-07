@@ -10,6 +10,7 @@ const { response } = require('express');
 const verify = require("./verifyJWTToken");
 
 
+
 router.get('/', verify, async (req, res) => {
     try{
         const userObj = await User.findById(req.user._id);
@@ -32,8 +33,10 @@ router.post('/', async (req, res) => {
     try{
         const discordUserId = req.body.discordUserId;
         const discordServerId = req.body.discordServerId;
+        console.log("ARIIIIIII");
         console.log(req.body)
         let userInGroup = await helpers.checkDiscordUserInDiscordServer(discordServerId, discordUserId);
+        console.log("userInGroup", userInGroup);
         if (userInGroup) {
             try {
                 groupDetails = await RoommateGroup.findOne({discordServerId: discordServerId});
@@ -142,7 +145,7 @@ router.delete('/deleteEvent', async (req, res) => {
     }
 
     catch(err){
-        res.json({message: err});
+        res.status(400).json({message: err});
         return;
     }
 });
