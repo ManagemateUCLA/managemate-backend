@@ -1,16 +1,35 @@
 // helper functions 
+/**
+ * * Helper method - gets row of matrix 
+ * @param matrix Matrix to get row from
+ * @param index of the row to be fetched
+ */
 function getRow(matrix, i) {
     return matrix[i];
 }
 
+/**
+ * * Helper method - gets column of matrix 
+ * @param matrix Matrix to get column from
+ * @param index of the column to be fetched
+ */
 function getColumn(matrix, i) {
     return matrix.map(matrix => matrix[i]);
 }
 
+/**
+ * * Helper method - gets sum of arr
+ * @param arr Arr to get sum of
+ */
 function getSum(arr) {
     return arr.reduce((partialSum, a) => partialSum + a, 0);
 }
 
+/**
+ * * Helper method - gets intersection of 2 sets  
+ * @param setA 1st set
+ * @param setB 2nd set
+ */
 function getIntersection(setA, setB) {
     const intersection = new Set(
       [...setA].filter(element => setB.has(element))
@@ -19,6 +38,10 @@ function getIntersection(setA, setB) {
     return intersection;
 }
 
+/**
+ * * Helper method - gets index of first positive element in teh arr
+ * @param arr array
+ */
 function firstPositiveElemIndex(arr) {
     for(let i = 0; i < arr.length; i++) {
         if (arr[i] > 0) {
@@ -28,21 +51,44 @@ function firstPositiveElemIndex(arr) {
     return -1;
 }
 
+/**
+ * * Helper method - gets balance between creditor and debitor from matrix
+ * @param creditor index of creditor 
+ * @param debitor index of debitor 
+ * @param matrix matrix 
+ */
 function getBalance(creditor, debitor, matrix) {
     return matrix[creditor][debitor]
 }
 
+/**
+ * * Helper method - updates balance between creditor and debitor from matrix
+ * @param creditor index of creditor 
+ * @param debitor index of debitor 
+ * @param matrix matrix 
+ * @param amount amount to be updated in matrix
+ */
 function updateBalance(creditor, debitor, amount, matrix) {
     matrix[creditor][debitor] += amount
 	return matrix
 }
 
+/**
+ * * Helper method - gets array of all positive indexes
+ * @param array array 
+ */
 function getPositiveIndexes(array) {
     return array                      
         .map((v, i) => v <= 0 ? -1 : i) 
         .filter(i => i + 1);          
 }
 
+/**
+ * * Helper method - gets common debitors of 2 creditors 
+ * @param debitor1 index of debitor1
+ * @param debitor2 index of debitor2
+ * @param matrix matrix 
+ */
 function getCommonDebitors(debitors1, debitors2, matrix) {
     let row1 = getPositiveIndexes(getRow(matrix, debitors1)); 
     let row2 = getPositiveIndexes(getRow(matrix, debitors2)); 
@@ -53,6 +99,10 @@ function getCommonDebitors(debitors1, debitors2, matrix) {
     return Array.from(getIntersection(db1_indexes, db2_indexes));
 }
 
+/**
+ * * Helper method - removes rendant transaction like A->B and B->A
+ * @param matrix matrix 
+ */
 function removeRedundancy(matrix) {
     let start = 0
     for(let i = 0; i < matrix.length; i++) {
@@ -71,6 +121,10 @@ function removeRedundancy(matrix) {
     return matrix;
 }
 
+/**
+ * * Helper method - converts the adjacency matrix of a graph to a bipartite graph
+ * @param matrix matrix 
+ */
 function makeGraphBipartite(matrix) {
     matrix = removeRedundancy(matrix);
     for(let i = 0; i < matrix.length; i++) {
@@ -103,6 +157,10 @@ function makeGraphBipartite(matrix) {
     return matrix;
 }
 
+/**
+ * * Helper method - simplifies hourglass transactions 
+ * @param matrix matrix 
+ */
 function simplifyHourglassTransactions(matrix) {
     let start = 1;
     for(let i = 0; i < matrix.length; i++) {
@@ -161,8 +219,13 @@ function simplifyHourglassTransactions(matrix) {
 //     [30, 40, 45, 0, 0]
 // ];
 
-// console.log(simplifyHourglassTransactions(makeGraphBipartite(matrix)));
-// console.log(getColumn(matrix, 0));
+/**
+ * * Helper method - splits up a transaction into multiple unit transactions 
+ * @param lender lender 
+ * @param borrowers borrowers 
+ * @param amount amount 
+ * @param type type of transaction - add or subtract
+ */
 function getUnitTransactions (lender, borrowers, amount, type) {
     let unitTransactions = [];
     let numBorrowers = borrowers.length;
