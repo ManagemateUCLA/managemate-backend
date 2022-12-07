@@ -191,9 +191,13 @@ paths:
                 properties:
                   discordServerId:
                     type: string
+                  members:
+                    type: array
+                    items: 
+                      type: string 
         responses:
           '200':
-            description: Successfully created a spending group table
+            description: Successfully adds a member to the spending group
 
           '400':
             description: Invalid request
